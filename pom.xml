@@ -14,6 +14,11 @@
     <maven.compiler.release>23</maven.compiler.release>
   </properties>
 
+  <build>
+  <sourceDirectory>gemini_lite</sourceDirectory>
+  </build>
+
+
   <dependencyManagement>
     <dependencies>
       <dependency>
