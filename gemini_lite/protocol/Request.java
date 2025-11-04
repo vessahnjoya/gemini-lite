@@ -1,17 +1,18 @@
 package protocol;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 public class Request {
 
-    private final String uri;
+    private final URI uri;
 
-    public Request(String uri) {
+    public Request(URI uri) {
         this.uri = uri;
     }
 
-    public String getUri() {
+    public URI getUri() {
         return uri;
     }
 
