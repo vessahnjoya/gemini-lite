@@ -4,10 +4,11 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
- * This class handles the request operation, handles parsing and its output
+ * This class implimnets the factory interface and provides implimentation for
+ * parsing a request and its output
  * format.
  */
-public class Request {
+public class Request implements Factory<Request> {
     // variable holding reference to the uri
     private final String uri;
 
@@ -50,7 +51,7 @@ public class Request {
         if (line.trim().isEmpty()) {
             throw new ProtocolSyntaxException("Empty request");
         }
-        //TODO: better validation
+        // TODO: better validation
         if (line.startsWith("gemini://")) {
             throw new ProtocolSyntaxException("Invalid URI in request: " + line);
         }
@@ -62,14 +63,11 @@ public class Request {
      * This method formats the request into the outputstream
      * 
      * @param requestOutput
+     * @throws IOException
      */
-    public void format(OutputStream requestOutput) {
+    public void format(OutputStream requestOutput) throws IOException {
         String request = uri + "\r\n";
-        try {
-            requestOutput.write(request.getBytes(StandardCharsets.UTF_8));
-            requestOutput.flush();
-        } catch (IOException e) {
-            System.err.println("Failed Request, Invalid URI " + e.getMessage());
-        }
+        requestOutput.write(request.getBytes(StandardCharsets.UTF_8));
+        requestOutput.flush();
     }
 }

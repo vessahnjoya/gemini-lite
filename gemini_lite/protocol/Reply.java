@@ -1,8 +1,14 @@
 package protocol;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
-public class Reply {
+/**
+ * This class implimnets the factory interface and provides implimentation for
+ * parsing a reply and its output
+ * format.
+ */
+public class Reply implements Factory<Reply> {
     // varaibles holding reference to status code, and meta respectively
     private final int statusCode;
     private final String meta;
@@ -43,12 +49,15 @@ public class Reply {
      * specification
      * 
      * @param in
-     * @return reply
+     *        the Input stream
+     * @return Reply
+     *         the reply
      * @throws ProtocolSyntaxException
      */
-    public static Reply parser(InputStream in) throws ProtocolSyntaxException {
-
-        return null;
+    public static Reply parser(InputStream in) throws ProtocolSyntaxException, IOException {
+        var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        String line = reader.readLine();
+        return new Reply(0, null);
     }
 
     /**
