@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
  * parsing a reply and its output
  * format.
  */
-public class Reply implements Factory<Reply> {
+public class Reply{
     // varaibles holding reference to status code, and meta respectively
     private final int statusCode;
     private final String meta;

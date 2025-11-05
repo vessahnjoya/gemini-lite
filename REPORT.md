@@ -1,8 +1,10 @@
 # Project Report
 
-Author: YOUR NAME HERE
-Email: YOUR EMAIL ADDRESS HERE
-Student ID number: STUDENT ID NUMBER HERE
+Author: Louis Nathan Vessah Njoya Tchuente
+
+Email: <v.vessahnjoyatchuente@student.maastrichtuniversity.nl>
+
+Student ID number: i6371413
 
 ## Gemini Lite Client Program
 

@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
  * parsing a request and its output
  * format.
  */
-public class Request implements Factory<Request> {
+public class Request{
     // variable holding reference to the uri
     private final String uri;
 
