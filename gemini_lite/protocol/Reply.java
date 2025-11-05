@@ -67,7 +67,15 @@ public class Reply {
             throw new ProtocolSyntaxException("Reply format is invalid: " + line);
         }
 
-        return new Reply(0, null);
+        int statusCode = 0;
+        try {
+            statusCode = Integer.parseInt(line.substring(0, 2));
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid status code: " + line.substring(0, 2));
+        }
+        String meta = line.substring(3).trim();
+        
+        return new Reply(statusCode, meta);
     }
 
     /**

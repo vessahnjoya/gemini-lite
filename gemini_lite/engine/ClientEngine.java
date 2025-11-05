@@ -1,7 +1,11 @@
 package engine;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 import protocol.Reply;
 import protocol.Request;
@@ -25,8 +29,6 @@ public class ClientEngine implements Engine {
         // if (validateURI()) {
         //     System.err.println(" Invalid URI, URI should not contain UserInfo!");
         // }
-        System.out.println(getHost());
-        System.out.println(getPort());
     }
 
     // /**
@@ -49,7 +51,7 @@ public class ClientEngine implements Engine {
      */
     private int getPort() {
         if (uri.getPort() == -1) {
-            return 1965;
+            return 1958;
         }
         return uri.getPort();
     }
@@ -74,13 +76,27 @@ public class ClientEngine implements Engine {
 
             var request = new Request(uri.toString());
             request.format(o);
-            System.out.println("stops here");
+
             var reply = Reply.parser(i);
-            // reply.format(o);
+            reply.format(o);
+            System.out.printf("%d %s%n", reply.getStatusCode(), reply.getMeta());
+
+            if (reply.getStatusCode()>=20) {
+                var reader = new BufferedReader(new InputStreamReader(i, StandardCharsets.UTF_8));
+                String line = reader.readLine();
+                while (line != null) {
+                    System.out.println(line);
+                }
+                System.exit(0);
+            }else{
+                System.err.println("Request not successful: " + reply.getStatusCode());
+            }
         } catch (UnknownHostException e) {
             System.err.println("Hostname does not EXIST: " + e.getMessage());
+            System.exit(1);
         } catch (IOException e) {
             System.err.println("Invalid input: " + e.getMessage());
+            System.exit(1);
         }
     }
 }
