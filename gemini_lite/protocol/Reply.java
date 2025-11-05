@@ -46,17 +46,16 @@ public class Reply {
      * This method parses the reply from inputStream following the Gemini
      * specification
      * 
-     * @param in
-     *           the Input stream
+     * @param reader
+     *               the buffered reader
      * @return Reply
-     *         the reply
+     *         the reply object
      * @throws ProtocolSyntaxException
      *                                 syntax errors in the reply line
      * @throws IOException
      *                                 I/o errors
      */
-    public static Reply parser(InputStream in) throws ProtocolSyntaxException, IOException {
-        var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+    public static Reply parser(BufferedReader reader) throws ProtocolSyntaxException, IOException {
         String line = reader.readLine();
 
         if (line.length() < 3 || line == null) {
@@ -74,7 +73,7 @@ public class Reply {
             System.err.println("Invalid status code: " + line.substring(0, 2));
         }
         String meta = line.substring(3).trim();
-        
+
         return new Reply(statusCode, meta);
     }
 

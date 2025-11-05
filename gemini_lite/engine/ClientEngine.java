@@ -3,12 +3,10 @@ package engine;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 
-import protocol.Reply;
-import protocol.Request;
+import protocol.*;
 
 /**
  * Thic class implements the Engine interface, and contains the running logic of
@@ -26,23 +24,24 @@ public class ClientEngine implements Engine {
     public ClientEngine(URI uri) {
         this.uri = uri;
 
-        // if (validateURI()) {
-        //     System.err.println(" Invalid URI, URI should not contain UserInfo!");
-        // }
+        if (validateURI()) {
+        System.err.println(" Invalid URI, URI should not contain UserInfo!");
+        System.exit(1);
+        }
     }
 
-    // /**
-    //  * Helpher method to check whether or not the URI contains userinfo, to complu
-    //  * with gemini specification
-    //  * 
-    //  * @return a boolean
-    //  */
-    // private boolean validateURI() {
-    //     if (!uri.getUserInfo().isEmpty()) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
+    /**
+    * Helpher method to check whether or not the URI contains userinfo, to complu
+    * with gemini specification
+    *
+    * @return a boolean
+    */
+    private boolean validateURI() {
+    if (!(uri.getUserInfo() == null)) {
+    return true;
+    }
+    return false;
+    }
 
     /**
      * Helper method to get port. If not stated, returns te default port 1965
@@ -67,28 +66,27 @@ public class ClientEngine implements Engine {
 
     @Override
     public void run() {
-        // TODO: IMPLEMENT THE CLIENT LOGIC (LAZY BUT HAVE TO PUSH AS TONY SAID)
 
         try (var socket = new Socket(getHost(), getPort())) {
-            // out.println(uri.toString());x
+            // remove the time out
+            // socket.setSoTimeout(10);
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
+            final var reader = new BufferedReader(new InputStreamReader(i, StandardCharsets.UTF_8));
 
             var request = new Request(uri.toString());
             request.format(o);
 
-            var reply = Reply.parser(i);
-            reply.format(o);
-            System.out.printf("%d %s%n", reply.getStatusCode(), reply.getMeta());
+            var reply = Reply.parser(reader);
+            // TODO: handle System.out to be flushed etc as per project manual, also think abpout the <input>
+            System.out.println(reply.getStatusCode() + " " + reply.getMeta());
 
-            if (reply.getStatusCode()>=20) {
-                var reader = new BufferedReader(new InputStreamReader(i, StandardCharsets.UTF_8));
-                String line = reader.readLine();
-                while (line != null) {
+            if (reply.getStatusCode() >= 20 && reply.getStatusCode() < 30) {
+                String line;
+                while ((line = reader.readLine()) != null) {
                     System.out.println(line);
                 }
-                System.exit(0);
-            }else{
+            } else {
                 System.err.println("Request not successful: " + reply.getStatusCode());
             }
         } catch (UnknownHostException e) {
