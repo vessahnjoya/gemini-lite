@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
  * parsing a request and its output
  * format.
  */
-public class Request{
+public class Request {
     // variable holding reference to the uri
     private final String uri;
 
@@ -51,8 +51,8 @@ public class Request{
         if (line.trim().isEmpty()) {
             throw new ProtocolSyntaxException("Empty request");
         }
-        // TODO: better validation
-        if (line.startsWith("gemini://")) {
+
+        if (!line.startsWith("gemini://") && !line.startsWith("gemini-lite://")) {
             throw new ProtocolSyntaxException("Invalid URI in request: " + line);
         }
 

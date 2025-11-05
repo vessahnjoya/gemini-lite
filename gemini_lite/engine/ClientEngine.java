@@ -3,9 +3,12 @@ package engine;
 import java.io.IOException;
 import java.net.*;
 
+import protocol.Reply;
 import protocol.Request;
+
 /**
- * Thic class implements the Engine interface, and contains the running logic of the client.
+ * Thic class implements the Engine interface, and contains the running logic of
+ * the client.
  */
 public class ClientEngine implements Engine {
     // Variable holding reference to the URI
@@ -19,24 +22,25 @@ public class ClientEngine implements Engine {
     public ClientEngine(URI uri) {
         this.uri = uri;
 
-        if (!validateURI()) {
-            System.err.println(" Invalid URI, URI should not contain UserInfo!");
-        }
-
+        // if (validateURI()) {
+        //     System.err.println(" Invalid URI, URI should not contain UserInfo!");
+        // }
+        System.out.println(getHost());
+        System.out.println(getPort());
     }
 
-    /**
-     * Helpher method to check whether or not the URI contains userinfo, to complu
-     * with gemini specification
-     * 
-     * @return a boolean
-     */
-    private boolean validateURI() {
-        if (uri.getUserInfo().isEmpty()) {
-            return true;
-        }
-        return false;
-    }
+    // /**
+    //  * Helpher method to check whether or not the URI contains userinfo, to complu
+    //  * with gemini specification
+    //  * 
+    //  * @return a boolean
+    //  */
+    // private boolean validateURI() {
+    //     if (!uri.getUserInfo().isEmpty()) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     /**
      * Helper method to get port. If not stated, returns te default port 1965
@@ -70,7 +74,9 @@ public class ClientEngine implements Engine {
 
             var request = new Request(uri.toString());
             request.format(o);
-            System.out.println("works");
+            System.out.println("stops here");
+            var reply = Reply.parser(i);
+            // reply.format(o);
         } catch (UnknownHostException e) {
             System.err.println("Hostname does not EXIST: " + e.getMessage());
         } catch (IOException e) {

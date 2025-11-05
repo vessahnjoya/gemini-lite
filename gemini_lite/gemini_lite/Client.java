@@ -11,7 +11,6 @@ import engine.Engine;
 public class Client {
     // variable holding reference to the engine
     private static Engine engine;
-    // TODO: update to implememt the engine instead
 
     public static void main(String[] args) throws Throwable {
 
@@ -19,9 +18,12 @@ public class Client {
             System.err.println("Invalid Request");
             System.exit(1);
         }
+
         var uri = new URI(args[0]);
         engine = new ClientEngine(uri);
 
-        engine.run();
+        while (true) {
+            engine.run();
+        }
     }
 }
