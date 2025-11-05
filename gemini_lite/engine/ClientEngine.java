@@ -68,7 +68,7 @@ public class ClientEngine implements Engine {
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
 
-            var request = new Request(uri);
+            var request = new Request(uri.toString());
             request.format(o);
             System.out.println("works");
         } catch (UnknownHostException e) {

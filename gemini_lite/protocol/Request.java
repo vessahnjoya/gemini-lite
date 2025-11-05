@@ -1,47 +1,61 @@
 package protocol;
 
 import java.io.*;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Thic class handles the request operation, hand;es parsing and its output
+ * This class handles the request operation, handles parsing and its output
  * format.
  */
 public class Request {
     // variable holding reference to the uri
-    private final URI uri;
+    private final String uri;
 
     /**
      * Comstructor to initialiZe the URI
      * 
      * @param uri
      */
-    public Request(URI uri) {
+    public Request(String uri) {
         this.uri = uri;
     }
 
     /**
-     * HELPHER METHOD TO GET THE uri
+     * Helper method to get the uri
      * 
      * @return URI
      */
-    public URI getUri() {
+    public String getUri() {
         return uri;
     }
 
-    // TODO: parsing implementation
     /**
      * This method parses the request from inputStream following the Gemini
      * specification
      * 
      * @param in
      * @return request
-     * @throws ProtocolSyntaxException
+     * @throws ProtocolSyntaxException Syntax errors
+     * @throws IOException             I/O errors realted to the reader
      */
-    public static Request parser(InputStream in) throws ProtocolSyntaxException {
-        return null;
+    public static Request parser(InputStream in) throws ProtocolSyntaxException, IOException {
 
+        var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        String line = reader.readLine();
+
+        if (line == null) {
+            throw new ProtocolSyntaxException("Null request");
+        }
+
+        if (line.trim().isEmpty()) {
+            throw new ProtocolSyntaxException("Empty request");
+        }
+        //TODO: better validation
+        if (line.startsWith("gemini://")) {
+            throw new ProtocolSyntaxException("Invalid URI in request: " + line);
+        }
+
+        return new Request(line);
     }
 
     /**
