@@ -77,7 +77,7 @@ public class ClientEngine implements Engine {
 
             var reply = Reply.parser(reader);
             // TODO: handle System.out to be flushed etc as per project manual, also think
-            // abpout the <input>
+            // about the <input>
             System.out.println(reply.getStatusCode() + " " + reply.getMeta());
 
             if (reply.getStatusCode() >= 20 && reply.getStatusCode() < 30) {
