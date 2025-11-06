@@ -25,22 +25,22 @@ public class ClientEngine implements Engine {
         this.uri = uri;
 
         if (validateURI()) {
-        System.err.println(" Invalid URI, URI should not contain UserInfo!");
-        System.exit(1);
+            System.err.println(" Invalid URI, URI should not contain UserInfo!");
+            System.exit(1);
         }
     }
 
     /**
-    * Helpher method to check whether or not the URI contains userinfo, to complu
-    * with gemini specification
-    *
-    * @return a boolean
-    */
+     * Helpher method to check whether or not the URI contains userinfo, to complu
+     * with gemini specification
+     *
+     * @return a boolean
+     */
     private boolean validateURI() {
-    if (!(uri.getUserInfo() == null)) {
-    return true;
-    }
-    return false;
+        if (!(uri.getUserInfo() == null)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -68,8 +68,6 @@ public class ClientEngine implements Engine {
     public void run() {
 
         try (var socket = new Socket(getHost(), getPort())) {
-            // remove the time out
-            // socket.setSoTimeout(10);
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
             final var reader = new BufferedReader(new InputStreamReader(i, StandardCharsets.UTF_8));
@@ -78,7 +76,8 @@ public class ClientEngine implements Engine {
             request.format(o);
 
             var reply = Reply.parser(reader);
-            // TODO: handle System.out to be flushed etc as per project manual, also think abpout the <input>
+            // TODO: handle System.out to be flushed etc as per project manual, also think
+            // abpout the <input>
             System.out.println(reply.getStatusCode() + " " + reply.getMeta());
 
             if (reply.getStatusCode() >= 20 && reply.getStatusCode() < 30) {
@@ -86,9 +85,10 @@ public class ClientEngine implements Engine {
                 while ((line = reader.readLine()) != null) {
                     System.out.println(line);
                 }
-            } else {
-                System.err.println("Request not successful: " + reply.getStatusCode());
+                System.out.flush();
+                System.exit(0);
             }
+
         } catch (UnknownHostException e) {
             System.err.println("Hostname does not EXIST: " + e.getMessage());
             System.exit(1);

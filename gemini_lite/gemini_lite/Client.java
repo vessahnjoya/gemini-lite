@@ -15,7 +15,7 @@ public class Client {
     public static void main(String[] args) throws Throwable {
 
         if (args.length < 1) {
-            System.err.println("Invalid Request");
+            System.err.println("Invalid Request, no URI present");
             System.exit(1);
         }
 

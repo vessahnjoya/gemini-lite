@@ -19,8 +19,8 @@ public class TerribleClient {
             }
 
             try (final var s = new Socket(hostName, port)) {
-                // var out = new PrintWriter(s.getOutputStream(), true);
-                // out.println(uri.toString());
+                var out = new PrintWriter(s.getOutputStream(), true);
+                out.println(uri.toString());
                 final var i = s.getInputStream();
                 final var o = s.getOutputStream();
                 String request = uri.toString() + "\r\n";
