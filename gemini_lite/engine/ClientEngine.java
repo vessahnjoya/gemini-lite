@@ -78,18 +78,19 @@ public class ClientEngine implements Engine {
             if (reply.getStatusCode() == 20) {
                 byte[] buffer = new byte[1024];
                 int read;
-                boolean flag = false; // using a flag to restore the CRLF as the readere removes it
+                boolean flag = false;
                 while ((read = i.read(buffer)) != -1) {
                     System.out.write(buffer, 0, read);
                     flag = true;
                 }
                 if (flag) {
                     System.out.print("\r\n");
-                    System.out.flush();
-                    System.exit(0);
                 }
+                System.out.flush();
+                System.exit(0);
 
             } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+                System.out.print(reply.getMeta());
                 System.out.flush();
                 System.exit(0);
             } else {

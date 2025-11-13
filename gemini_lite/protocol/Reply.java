@@ -61,7 +61,7 @@ public class Reply {
         String line = reader.readLine();
 
         if (line.length() < 3 || line == null) {
-            throw new ProtocolSyntaxException("Reply l;ine too short");
+            throw new ProtocolSyntaxException("Reply line too short");
         }
 
         if (!Character.isDigit(line.charAt(0)) || !Character.isDigit(line.charAt(1)) || line.charAt(2) != ' ') {
@@ -72,9 +72,9 @@ public class Reply {
         try {
             statusCode = Integer.parseInt(line.substring(0, 2));
         } catch (NumberFormatException e) {
-            System.err.println("Invalid status code: " + line.substring(0, 2));
+            throw new ProtocolSyntaxException("Invalid status code: " + line.substring(0,2))
         }
-        String meta = line.substring(3).trim();
+        String meta = line.substring(3);
 
         return new Reply(statusCode, meta);
     }
@@ -87,7 +87,7 @@ public class Reply {
      * 
      */
     public void format(OutputStream replyOutput) throws IOException {
-        String reply = String.format("%02d %s\r\n ", statusCode, meta);
+        String reply = String.format("%02d %s\r\n", statusCode, meta);
         replyOutput.write(reply.getBytes(StandardCharsets.UTF_8));
         replyOutput.flush();
     }
