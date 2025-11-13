@@ -1,6 +1,7 @@
 package protocol;
 
 import java.io.*;
+import java.nio.BufferOverflowException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -46,8 +47,8 @@ public class Reply {
      * This method parses the reply from inputStream following the Gemini
      * specification
      * 
-     * @param reader
-     *               the buffered reader
+     * @param i
+     *               the input stream
      * @return Reply
      *         the reply object
      * @throws ProtocolSyntaxException
@@ -55,7 +56,8 @@ public class Reply {
      * @throws IOException
      *                                 I/o errors
      */
-    public static Reply parser(BufferedReader reader) throws ProtocolSyntaxException, IOException {
+    public static Reply parser(InputStream i) throws ProtocolSyntaxException, IOException {
+        var reader = new BufferedReader(new InputStreamReader(i, StandardCharsets.UTF_8));
         String line = reader.readLine();
 
         if (line.length() < 3 || line == null) {

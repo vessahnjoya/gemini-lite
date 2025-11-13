@@ -1,10 +1,7 @@
 package engine;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 
 import protocol.*;
 
@@ -70,26 +67,37 @@ public class ClientEngine implements Engine {
         try (var socket = new Socket(getHost(), getPort())) {
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
-            final var reader = new BufferedReader(new InputStreamReader(i, StandardCharsets.UTF_8));
 
             var request = new Request(uri.toString());
             request.format(o);
 
-            var reply = Reply.parser(reader);
-            // TODO: handle System.out to be flushed etc as per project manual, also think
-            // about the <input>
-            System.out.println(reply.getStatusCode() + " " + reply.getMeta());
+            var reply = Reply.parser(i);
 
-            if (reply.getStatusCode() >= 20 && reply.getStatusCode() < 30) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
+            System.out.print(reply.getStatusCode() + " " + reply.getMeta() + "\r\n");
+
+            if (reply.getStatusCode() == 20) {
+                byte[] buffer = new byte[1024];
+                int read;
+                boolean flag = false; // using a flag to restore the CRLF as the readere removes it
+                while ((read = i.read(buffer)) != -1) {
+                    System.out.write(buffer, 0, read);
+                    flag = true;
                 }
+                if (flag) {
+                    System.out.print("\r\n");
+                    System.out.flush();
+                    System.exit(0);
+                }
+
+            } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
                 System.out.flush();
                 System.exit(0);
+            } else {
+                System.out.flush();
+                System.exit(1);
             }
 
-        } catch(UnknownHostException e){
+        } catch (UnknownHostException e) {
             System.err.println("Invalid HostName: " + e.getMessage());
             System.exit(1);
         }
