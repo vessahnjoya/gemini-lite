@@ -1,7 +1,6 @@
 package engine;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 /**
  * Engine interface to encapsulate client engine implimentation through the use
@@ -10,9 +9,7 @@ import java.net.UnknownHostException;
 public interface Engine {
     /**
      * Run the protocol engine
-     * 
-     * @throws IOException
-     * @throws UnknownHostException
+     * @throws IOException 
      */
-    void run();
+    void run() throws IOException;
 }

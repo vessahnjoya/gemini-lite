@@ -31,7 +31,7 @@ public class ClientEngine implements Engine {
     }
 
     /**
-     * Helpher method to check whether or not the URI contains userinfo, to complu
+     * Helpher method to check whether or not the URI contains userinfo, to complY
      * with gemini specification
      *
      * @return a boolean
@@ -44,7 +44,7 @@ public class ClientEngine implements Engine {
     }
 
     /**
-     * Helper method to get port. If not stated, returns te default port 1965
+     * Helper method to get port. If not stated, returns tHe default port 1958
      * 
      * @return port number
      */
@@ -65,7 +65,7 @@ public class ClientEngine implements Engine {
     }
 
     @Override
-    public void run() {
+    public void run() throws IOException {
 
         try (var socket = new Socket(getHost(), getPort())) {
             final var i = socket.getInputStream();
@@ -89,11 +89,8 @@ public class ClientEngine implements Engine {
                 System.exit(0);
             }
 
-        } catch (UnknownHostException e) {
-            System.err.println("Hostname does not EXIST: " + e.getMessage());
-            System.exit(1);
-        } catch (IOException e) {
-            System.err.println("Invalid input: " + e.getMessage());
+        } catch(UnknownHostException e){
+            System.err.println("Invalid HostName: " + e.getMessage());
             System.exit(1);
         }
     }

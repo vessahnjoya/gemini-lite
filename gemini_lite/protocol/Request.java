@@ -52,7 +52,7 @@ public class Request {
             throw new ProtocolSyntaxException("Empty request");
         }
 
-        if (!line.startsWith("gemini://") && !line.startsWith("gemini-lite://")) {
+        if (!line.startsWith("gemini-lite://")) {
             throw new ProtocolSyntaxException("Invalid URI in request: " + line);
         }
 

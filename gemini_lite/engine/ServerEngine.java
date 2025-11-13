@@ -1,24 +1,40 @@
-package gemini_lite;
+package engine;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 
-import protocol.Reply;
-import protocol.Request;
+import protocol.*;
 
-public class Server {
-    // TODO
-
+public class ServerEngine implements Engine {
+    // Variable holding reference to the URI
     private final int port;
 
-    public Server(int port) {
+    /**
+     * Constructor to initialize URI
+     * 
+     * @param uri
+     */
+    public ServerEngine(int port) {
         this.port = port;
+
     }
 
+    /**
+     * Helper method to get port. If not stated, returns tHe default port 1958
+     * 
+     * @return port number
+     */
+    private int getPort() {
+        if (port == -1) {
+            return 1958;
+        }
+        return port;
+    }
+
+    @Override
     public void run() throws IOException {
-        try (final var server = new ServerSocket(port)) {
+
+         try (final var server = new ServerSocket(port)) {
             System.err.println("Listening on port " + port);
             while (true) {
                 final var socket = server.accept();
@@ -26,6 +42,7 @@ public class Server {
             }
         }
     }
+
 
     public void handleConnection(Socket socket) throws IOException {
         try {
