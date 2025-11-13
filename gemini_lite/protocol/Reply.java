@@ -72,7 +72,7 @@ public class Reply {
         try {
             statusCode = Integer.parseInt(line.substring(0, 2));
         } catch (NumberFormatException e) {
-            throw new ProtocolSyntaxException("Invalid status code: " + line.substring(0,2))
+            throw new ProtocolSyntaxException("Invalid status code: " + line.substring(0,2));
         }
         String meta = line.substring(3);
 
