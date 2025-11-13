@@ -1,5 +1,11 @@
 package gemini_lite;
 
 public class Server {
-    //TODO
+    // TODO
+
+    private final int port;
+
+    public Server(int port) {
+        this.port = port;
+    }
 }
