@@ -21,7 +21,7 @@ public class ClientEngine implements Engine {
     public ClientEngine(URI uri) {
         this.uri = uri;
 
-        if (validateURI()) {
+        if (hasUserInfo()) {
             System.err.println(" Invalid URI, URI should not contain UserInfo!");
             System.exit(1);
         }
@@ -33,11 +33,8 @@ public class ClientEngine implements Engine {
      *
      * @return a boolean
      */
-    private boolean validateURI() {
-        if (!(uri.getUserInfo() == null)) {
-            return true;
-        }
-        return false;
+    private boolean hasUserInfo() {
+        return uri.getUserInfo() != null;
     }
 
     /**
