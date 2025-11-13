@@ -1,7 +1,6 @@
 package protocol;
 
 import java.io.*;
-import java.nio.BufferOverflowException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -13,6 +12,9 @@ public class Reply {
     // varaibles holding reference to status code, and meta respectively
     private final int statusCode;
     private final String meta;
+
+    // constant to account for meta length
+    private static final int MAX_META_BYTE_SIZE = 1024;
 
     /**
      * Constructor to initialize status code and meta
@@ -47,8 +49,8 @@ public class Reply {
      * This method parses the reply from inputStream following the Gemini
      * specification
      * 
-     * @param i
-     *               the input stream
+     * @param in
+     *           the input stream
      * @return Reply
      *         the reply object
      * @throws ProtocolSyntaxException
@@ -56,13 +58,43 @@ public class Reply {
      * @throws IOException
      *                                 I/o errors
      */
-    public static Reply parser(InputStream i) throws ProtocolSyntaxException, IOException {
-        var reader = new BufferedReader(new InputStreamReader(i, StandardCharsets.UTF_8));
-        String line = reader.readLine();
+    public static Reply parser(InputStream in) throws ProtocolSyntaxException, IOException {
+        var buffer = new ByteArrayOutputStream();
+        int count = 0;
+        while (true) {
+            int reader = in.read();
+            boolean flag = false;
+            if (reader == -1) {
+                if (count == 0) {
+                    throw new ProtocolSyntaxException("End of stream before reply line");
+                }
+                throw new ProtocolSyntaxException("End of stream, Missing CRLF");
+            }
 
-        if (line.length() < 3 || line == null) {
-            throw new ProtocolSyntaxException("Reply line too short");
+            if (reader == '\r') {
+                flag = true;
+                continue;
+            }
+
+            if (reader == '\n') {
+                if (!flag) {
+                    throw new ProtocolSyntaxException("LF found without CR");
+                }
+                break;
+            }
+
+            if (flag) {
+                throw new ProtocolSyntaxException("Found CR without LF");
+            }
+
+            count++;
+            if (count > MAX_META_BYTE_SIZE) {
+                throw new ProtocolSyntaxException("Reply line exceeds max length");
+            }
+
+            buffer.write(reader);
         }
+        String line = buffer.toString(StandardCharsets.UTF_8.name());
 
         if (!Character.isDigit(line.charAt(0)) || !Character.isDigit(line.charAt(1)) || line.charAt(2) != ' ') {
             throw new ProtocolSyntaxException("Reply format is invalid: " + line);
@@ -72,7 +104,7 @@ public class Reply {
         try {
             statusCode = Integer.parseInt(line.substring(0, 2));
         } catch (NumberFormatException e) {
-            throw new ProtocolSyntaxException("Invalid status code: " + line.substring(0,2));
+            throw new ProtocolSyntaxException("Invalid status code: " + line.substring(0, 2));
         }
         String meta = line.substring(3);
 

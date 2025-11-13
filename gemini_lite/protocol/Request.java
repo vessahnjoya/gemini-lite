@@ -12,6 +12,11 @@ public class Request {
     // variable holding reference to the uri
     private final String uri;
 
+    // constants to account for uri length and the expected scheme for the uri
+    // respectively
+    private static final int MAX_URI_BYTE_SIZE = 1024;
+    private static final String URI_SCHEME = "gemini-lite://";
+
     /**
      * Comstructor to initialiZe the URI
      * 
@@ -32,30 +37,53 @@ public class Request {
 
     /**
      * This method parses the request from inputStream following the Gemini
-     * specification
+     * specification, and reading byte-byte as recommended
      * 
      * @param in
      * @return request
-     * @throws ProtocolSyntaxException Syntax errors
+     * @throws ProtocolSyntaxException Syntax errors in the request line
      * @throws IOException             I/O errors realted to the reader
      */
     public static Request parser(InputStream in) throws ProtocolSyntaxException, IOException {
+        var buffer = new ByteArrayOutputStream();
+        int count = 0;
+        while (true) {
+            int reader = in.read();
+            boolean flag = false;
+            if (reader == -1) {
+                if (count == 0) {
+                    throw new ProtocolSyntaxException("End of stream before request line");
+                }
+                throw new ProtocolSyntaxException("End of stream, Missing CRLF");
+            }
 
-        var reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-        String line = reader.readLine();
+            if (reader == '\r') {
+                flag = true;
+                continue;
+            }
 
-        if (line == null) {
-            throw new ProtocolSyntaxException("Null request");
+            if (reader == '\n') {
+                if (!flag) {
+                    throw new ProtocolSyntaxException("LF found without CR");
+                }
+                break;
+            }
+
+            if (flag) {
+                throw new ProtocolSyntaxException("Found CR without LF");
+            }
+
+            count++;
+            if (count > MAX_URI_BYTE_SIZE) {
+                throw new ProtocolSyntaxException("URI exceeds max length");
+            }
+
+            buffer.write(reader);
         }
-
-        if (line.trim().isEmpty()) {
-            throw new ProtocolSyntaxException("Empty request");
+        String line = buffer.toString(StandardCharsets.UTF_8.name());
+        if (line.isEmpty() || !line.startsWith(URI_SCHEME)) {
+            throw new ProtocolSyntaxException("Invalid or empty URI");
         }
-
-        if (!line.startsWith("gemini-lite://")) {
-            throw new ProtocolSyntaxException("Invalid URI in request: " + line);
-        }
-
         return new Request(line);
     }
 

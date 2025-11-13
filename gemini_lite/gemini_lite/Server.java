@@ -1,12 +1,10 @@
 package gemini_lite;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import protocol.Reply;
-import protocol.Request;
+import protocol.*;
 
 public class Server {
     // TODO
@@ -34,7 +32,7 @@ public class Server {
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
 
-            var request = Request.parser(i);
+            // var request = Request.parser(i);
             o.flush();
         } finally {
             socket.close();
