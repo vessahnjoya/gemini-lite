@@ -21,10 +21,10 @@ public class ClientEngine implements Engine {
     public ClientEngine(URI uri) {
         this.uri = uri;
 
-        // if (hasUserInfo()) {
-        //     System.err.println(" Invalid URI, URI should not contain UserInfo!");
-        //     System.exit(1);
-        // }
+        if (hasUserInfo()) {
+            System.err.println(" Invalid URI, URI should not contain UserInfo!");
+            System.exit(1);
+        }
     }
 
     /**
