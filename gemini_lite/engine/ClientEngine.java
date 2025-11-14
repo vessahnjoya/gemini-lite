@@ -83,7 +83,7 @@ public class ClientEngine implements Engine {
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
 
-            var request = new Request(uri.toString());
+            var request = new Request(current.toString());
             request.format(o);
 
             var reply = Reply.parser(i);
@@ -95,7 +95,7 @@ public class ClientEngine implements Engine {
                 System.out.flush();
                 System.exit(0);
             } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
-                HandleRedirect(uri, count, reply.getMeta().trim());
+                HandleRedirect(current, count, reply.getMeta().trim());
             } else {
                 System.out.flush();
                 System.exit(1);
