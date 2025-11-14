@@ -86,6 +86,9 @@ public class ClientEngine implements Engine {
                 System.out.print(reply.getMeta());
                 System.out.flush();
                 System.exit(0);
+            }else{
+                System.out.flush();
+                System.exit(1);
             }
 
         } catch (UnknownHostException e) {
