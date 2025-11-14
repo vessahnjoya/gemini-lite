@@ -75,14 +75,11 @@ public class ClientEngine implements Engine {
             if (reply.getStatusCode() == 20) {
                 byte[] buffer = new byte[1024];
                 int read;
-                boolean flag = false;
                 while ((read = i.read(buffer)) != -1) {
                     System.out.write(buffer, 0, read);
-                    flag = true;
                 }
-                if (flag) {
-                    System.out.print("\r\n");
-                }
+                System.out.print("\r\n");
+
                 System.out.flush();
                 System.exit(0);
 
