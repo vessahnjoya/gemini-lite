@@ -21,9 +21,9 @@ public class Client {
 
         var uri = new URI(args[0]);
         engine = new ClientEngine(uri);
-
-        while (true) {
-            engine.run();
-        }
+        engine.run();
+        // while (true) {
+        //     engine.run();
+        // }
     }
 }
