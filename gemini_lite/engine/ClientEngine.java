@@ -79,7 +79,6 @@ public class ClientEngine implements Engine {
                     System.out.write(buffer, 0, read);
                 }
                 System.out.print("\r\n");
-
                 System.out.flush();
                 System.exit(0);
 
@@ -87,9 +86,6 @@ public class ClientEngine implements Engine {
                 System.out.print(reply.getMeta());
                 System.out.flush();
                 System.exit(0);
-            } else {
-                System.out.flush();
-                System.exit(1);
             }
 
         } catch (UnknownHostException e) {
