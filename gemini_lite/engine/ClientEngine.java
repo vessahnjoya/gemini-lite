@@ -120,7 +120,7 @@ public class ClientEngine implements Engine {
             return;
         }
 
-        if (!"gemini-lite://".equalsIgnoreCase(target.getScheme())) {
+        if (!"gemini-lite".equalsIgnoreCase(target.getScheme())) {
             System.err.println("Non-Gemini redirect not supported: " + target);
             System.exit(1);
             return;
