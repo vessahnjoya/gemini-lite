@@ -3,6 +3,7 @@ package engine;
 import java.io.IOException;
 import java.net.*;
 
+import gemini_lite.Client;
 import protocol.*;
 
 /**
@@ -14,7 +15,7 @@ public class ClientEngine implements Engine {
     private final URI uri;
     private final int MAX_REDIRECTS = 5;
     private final int DEFAULT_PORT = 1958;
-
+    private int global_counter = 0;
 
     /**
      * Constructor to initialize URI
@@ -85,16 +86,12 @@ public class ClientEngine implements Engine {
                 System.out.flush();
                 System.exit(0);
             } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
-                System.out.print(reply.getMeta());
-                int count = 0;
-                while (count < MAX_REDIRECTS ) {
-                    var engine = new ClientEngine(URI.create(uri.toString()));
-                engine.run();
-                count++;
+                if (global_counter > MAX_REDIRECTS) {
+                    System.err.println("Too many redirects");
+                    System.exit(1);
                 }
-                System.out.flush();
-                System.exit(0);
-            }else{
+                HandleRedirect(uri, global_counter, reply.getMeta().trim());
+            } else {
                 System.out.flush();
                 System.exit(1);
             }
@@ -103,5 +100,25 @@ public class ClientEngine implements Engine {
             System.err.println("Invalid HostName: " + e.getMessage());
             System.exit(1);
         }
+    }
+
+    private void HandleRedirect(URI givenUri, int count, String meta) throws IOException {
+        URI target = null;
+        try {
+            target = new URI(meta);
+            if (!target.isAbsolute()) {
+                target = givenUri.resolve(meta);
+            }
+        } catch (URISyntaxException e) {
+            System.err.println("Invalid redirecting URL: " + meta);
+            System.exit(1);
+        }
+
+        if (!"gemini-lite://".equalsIgnoreCase(target.getScheme())) {
+            System.err.println("Non gemini-lite URL: " + target);
+        }
+
+        global_counter++;
+         new ClientEngine(target).run();
     }
 }
