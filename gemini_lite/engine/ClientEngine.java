@@ -10,8 +10,11 @@ import protocol.*;
  * the client.
  */
 public class ClientEngine implements Engine {
-    // Variable holding reference to the URI
+    // Variable holding reference to the URI and constants respecrively
     private final URI uri;
+    private final int MAX_REDIRECTS = 5;
+    private final int DEFAULT_PORT = 1958;
+
 
     /**
      * Constructor to initialize URI
@@ -44,7 +47,7 @@ public class ClientEngine implements Engine {
      */
     private int getPort() {
         if (uri.getPort() == -1) {
-            return 1958;
+            return DEFAULT_PORT;
         }
         return uri.getPort();
     }
@@ -81,9 +84,14 @@ public class ClientEngine implements Engine {
                 System.out.print("\r\n");
                 System.out.flush();
                 System.exit(0);
-
             } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
                 System.out.print(reply.getMeta());
+                int count = 0;
+                while (count < MAX_REDIRECTS ) {
+                    var engine = new ClientEngine(URI.create(uri.toString()));
+                engine.run();
+                count++;
+                }
                 System.out.flush();
                 System.exit(0);
             }else{
