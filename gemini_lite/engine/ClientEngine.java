@@ -44,11 +44,11 @@ public class ClientEngine implements Engine {
      * 
      * @return port number
      */
-    private int getPort() {
-        if (uri.getPort() == -1) {
+    private int getPort(URI current) {
+        if (current.getPort() == -1) {
             return DEFAULT_PORT;
         }
-        return uri.getPort();
+        return current.getPort();
     }
 
     /**
@@ -56,8 +56,8 @@ public class ClientEngine implements Engine {
      * 
      * @return host name
      */
-    private String getHost() {
-        return uri.getHost();
+    private String getHost(URI current) {
+        return current.getHost();
     }
 
     private void reader(InputStream i) throws IOException {
@@ -79,7 +79,7 @@ public class ClientEngine implements Engine {
             System.err.println("Maximum redirects amount reached");
             System.exit(1);
         }
-        try (var socket = new Socket(getHost(), getPort())) {
+        try (var socket = new Socket(getHost(current), getPort(current))) {
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
 
@@ -107,20 +107,23 @@ public class ClientEngine implements Engine {
         }
     }
 
-    private void HandleRedirect(URI givenUri, int count, String meta) throws IOException {
-        URI target = null;
+    private void HandleRedirect(URI current, int count, String meta) throws IOException {
+        URI target;
         try {
             target = new URI(meta);
             if (!target.isAbsolute()) {
-                target = givenUri.resolve(meta);
+                target = current.resolve(meta);
             }
         } catch (URISyntaxException e) {
             System.err.println("Invalid redirecting URL: " + meta);
             System.exit(1);
+            return;
         }
 
         if (!"gemini-lite://".equalsIgnoreCase(target.getScheme())) {
-            System.err.println("Non gemini-lite URL: " + target);
+            System.err.println("Non-Gemini redirect not supported: " + target);
+            System.exit(1);
+            return;
         }
 
         runWithRedirect(target, count + 1);
