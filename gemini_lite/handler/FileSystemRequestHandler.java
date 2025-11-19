@@ -2,9 +2,13 @@ package handler;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import protocol.*;
 
@@ -23,7 +27,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
         try {
             URI uri = request.getUri();
 
-            if (!"gemini-lite://".equals(uri.getScheme())) {
+            if (!"gemini-lite".equals(uri.getScheme())) {
                 return new Reply(59, "Invalid URI, does not contain expected scheme");
             }
             String path = uri.getPath();
@@ -33,20 +37,27 @@ public class FileSystemRequestHandler implements ResourceHandler {
             Path requestedPath = resolvePath(path);
 
             if (requestedPath == null) {
-                return new Reply(52, "Not Found");
-            }
-
-            if (!Files.isDirectory(requestedPath)) {
-                return new Reply(51, "path  is a directory");
+                return new Reply(51, "Not Found");
             }
 
             if (!Files.exists(requestedPath) || !Files.isReadable(requestedPath)) {
-                return new Reply(50, "Not Found");
+                return new Reply(51, "Not Found");
             }
 
-            String mimeType = getMimeType(requestedPath);
+            if (Files.isDirectory(requestedPath)) {
+                String mime = "text/gemini";
+                InputStream body = listDirectoryElements(requestedPath);
+                
+                return new Reply(20, mime, body);
+            }
 
-            return new Reply(20, mimeType);
+            if (Files.isRegularFile(requestedPath) && Files.isReadable(requestedPath)) {
+                String mime = getMimeType(requestedPath);
+                InputStream body = Files.newInputStream(requestedPath);
+                return new Reply(20, mime, body);
+            }
+
+            return new Reply(51, "Not Found");
 
         } catch (Exception e) {
             return new Reply(50, "Server crashed");
@@ -70,7 +81,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
             return "image/jpeg";
         }
 
-        return "application-octet/stream";
+        return "application/octet-stream";
     }
 
     private Path resolvePath(String p) {
@@ -106,10 +117,40 @@ public class FileSystemRequestHandler implements ResourceHandler {
             throw new ProtocolSyntaxException("File Not found");
         }
 
+        if (Files.isDirectory(requestedPath)) {
+            return listDirectoryElements(requestedPath);
+        }
+
         if (!Files.isReadable(requestedPath)) {
             throw new ProtocolSyntaxException("File is not readable");
         }
 
         return Files.newInputStream(requestedPath);
+    }
+
+    private InputStream listDirectoryElements(Path dir) throws IOException {
+        StringBuilder list = new StringBuilder();
+        String folderPath = path.relativize(dir).toString().replace('\\', '/');
+
+        if (folderPath.isEmpty()) {
+            folderPath = "/";
+        }
+        list.append("Directory Listing for ").append(folderPath).append("\r\n\r\n");
+
+        List<Path> items = Files.list(dir).sorted().collect(Collectors.toList());
+
+        for (Path item : items) {
+            String fileName = item.getFileName().toString();
+            String link = "/" + path.relativize(item).toString().replace("\\", "/");
+
+            if (Files.isDirectory(item)) {
+                link += "/";
+                fileName += "/";
+            }
+
+            list.append("=> ").append(link).append(" ").append(fileName).append("\r\n");
+        }
+
+        return new ByteArrayInputStream(list.toString().getBytes(StandardCharsets.UTF_8));
     }
 }

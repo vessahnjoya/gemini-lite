@@ -67,6 +67,8 @@ public class ServerEngine implements Engine {
             request = Request.parse(i);
             reply = resourceHandler.handle(request);
 
+            reply.format(o);
+
         } catch (ProtocolSyntaxException e) {
             reply = new Reply(59, "Bad Request");
             System.err.println("Protocol error: " + e.getMessage());
@@ -74,34 +76,11 @@ public class ServerEngine implements Engine {
             reply = new Reply(50, "Server error");
             System.err.println("Unexpected Error: " + e.getMessage());
         }
-
-        if (reply != null) {
-            reply.format(o);
-        }
-
-        if (reply.getStatusCode() == 20 && request != null) {
-            try (var in = resourceHandler.getData(request)) {
-                transferData(in, o);
-            }
-        }
-    }
-
-    private void transferData(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        int read;
-
-        while ((read = in.read(buffer)) != -1) {
-            out.write(buffer, 0, read);
-        }
-
-        out.flush();
     }
 
     private void sendErrorReply(Socket socket, Reply reply) throws IOException {
         try (var out = socket.getOutputStream()) {
             reply.format(out);
-        } finally {
-            socket.close();
         }
     }
 }

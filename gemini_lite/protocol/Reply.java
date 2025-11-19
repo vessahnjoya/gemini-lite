@@ -12,6 +12,7 @@ public class Reply {
     // varaibles holding reference to status code, and meta respectively
     private final int statusCode;
     private final String meta;
+    private final InputStream body;
 
     /**
      * Constructor to initialize status code and meta
@@ -20,8 +21,13 @@ public class Reply {
      * @param meta
      */
     public Reply(int statusCode, String meta) {
+        this(statusCode,meta,null);
+    }
+
+    public Reply(int statusCode, String meta, InputStream body) {
         this.statusCode = statusCode;
         this.meta = meta;
+        this.body = body;
     }
 
     /**
@@ -116,6 +122,11 @@ public class Reply {
     public void format(OutputStream replyOutput) throws IOException {
         String reply = String.format("%02d %s\r\n", statusCode, meta);
         replyOutput.write(reply.getBytes(StandardCharsets.UTF_8));
+
+        if (body != null) {
+            body.transferTo(replyOutput);
+            body.close();
+        }
         replyOutput.flush();
     }
 
