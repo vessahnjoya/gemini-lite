@@ -32,7 +32,7 @@ public class Server {
             if (!path.toFile().isDirectory()) {
                 System.err.println("Path is not a directory: " + path);
             }
-            resourceHandler = ResourceHandler.fileSystem(null);
+            resourceHandler = ResourceHandler.fileSystem(path);
             engine = new ServerEngine(port, resourceHandler);
             engine.run();
         } catch (IOException e) {
