@@ -51,7 +51,7 @@ public class ServerEngine implements Engine {
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
 
-            var request = Request.parser(i);
+            var request = Request.parse(i);
             o.flush();
         } finally {
             socket.close();

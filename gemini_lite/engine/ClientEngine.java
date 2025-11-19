@@ -86,7 +86,7 @@ public class ClientEngine implements Engine {
             var request = new Request(current.toString());
             request.format(o);
 
-            var reply = Reply.parser(i);
+            var reply = Reply.parse(i);
 
             System.out.print(reply.getStatusCode() + " " + reply.getMeta() + "\r\n");
 

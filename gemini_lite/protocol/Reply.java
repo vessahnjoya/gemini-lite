@@ -55,7 +55,7 @@ public class Reply {
      * @throws IOException
      *                                 I/o errors
      */
-    public static Reply parser(InputStream in) throws ProtocolSyntaxException, IOException {
+    public static Reply parse(InputStream in) throws ProtocolSyntaxException, IOException {
         var buffer = new ByteArrayOutputStream();
         boolean flag = false;
 

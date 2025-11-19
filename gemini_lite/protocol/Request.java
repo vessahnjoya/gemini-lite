@@ -44,7 +44,7 @@ public class Request {
      * @throws ProtocolSyntaxException Syntax errors in the request line
      * @throws IOException             I/O errors realted to the reader
      */
-    public static Request parser(InputStream in) throws ProtocolSyntaxException, IOException {
+    public static Request parse(InputStream in) throws ProtocolSyntaxException, IOException {
         var buffer = new ByteArrayOutputStream();
         int count = 0;
         while (true) {
