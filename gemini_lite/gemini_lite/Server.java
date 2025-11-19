@@ -1,41 +1,43 @@
 package gemini_lite;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.nio.file.Paths;
 
-import protocol.*;
+import engine.*;
+import handler.*;
 
+/**
+ * This class represents a Client
+ */
 public class Server {
-    // TODO
+    // variable holding reference to the engine
+    private static Engine engine;
+    private static ResourceHandler resourceHandler;
 
-    private final int port;
+    public static void main(String[] args) throws Throwable {
 
-    public Server(int port) {
-        this.port = port;
-    }
-
-    public void run() throws IOException {
-        try (final var server = new ServerSocket(port)) {
-            System.err.println("Listening on port " + port);
-            while (true) {
-                final var socket = server.accept();
-                handleConnection(socket);
-            }
+        if (args.length < 1 || args.length > 2) {
+            System.err.println("Invalid usage, use: <directory> <port>");
+            System.exit(1);
         }
-    }
 
-    public void handleConnection(Socket socket) throws IOException {
+        String directoryPath = args[0];
+        int port = Integer.parseInt(args[1]);
         try {
-            // TODO: read request. This server is so terrible it doesn't even wait for a
-            // request before sending a failure reply!
-            final var i = socket.getInputStream();
-            final var o = socket.getOutputStream();
+            var path = Paths.get(directoryPath);
 
-            // var request = Request.parser(i);
-            o.flush();
-        } finally {
-            socket.close();
+            if (!path.toFile().exists()) {
+                System.err.println("Directory does not exits: " + path);
+            }
+            if (!path.toFile().isDirectory()) {
+                System.err.println("Path is not a directory: " + path);
+            }
+            resourceHandler = ResourceHandler.fileSystem(null);
+            engine = new ServerEngine(port, resourceHandler);
+            engine.run();
+        } catch (IOException e) {
+            System.err.println("Error while starting server: " + e.getMessage());
+            System.exit(1);
         }
     }
 }
