@@ -1,6 +1,8 @@
 package protocol;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -10,7 +12,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class Request {
     // variable holding reference to the uri
-    private final String uri;
+    private final URI uri;
 
     // constants to account for uri length and the expected scheme for the uri
     // respectively
@@ -22,7 +24,7 @@ public class Request {
      * 
      * @param uri
      */
-    public Request(String uri) {
+    public Request(URI uri) {
         this.uri = uri;
     }
 
@@ -31,7 +33,7 @@ public class Request {
      * 
      * @return URI
      */
-    public String getUri() {
+    public URI getUri() {
         return uri;
     }
 
@@ -43,8 +45,9 @@ public class Request {
      * @return request
      * @throws ProtocolSyntaxException Syntax errors in the request line
      * @throws IOException             I/O errors realted to the reader
+     * @throws URISyntaxException 
      */
-    public static Request parse(InputStream in) throws ProtocolSyntaxException, IOException {
+    public static Request parse(InputStream in) throws ProtocolSyntaxException, IOException, URISyntaxException {
         var buffer = new ByteArrayOutputStream();
         int count = 0;
         while (true) {
@@ -63,7 +66,7 @@ public class Request {
             }
 
             if (reader == '\n') {
-                if (!flag) {
+                if (flag) {
                     throw new ProtocolSyntaxException("LF found without CR");
                 }
                 break;
@@ -84,7 +87,7 @@ public class Request {
         if (line.isEmpty() || !line.startsWith(URI_SCHEME)) {
             throw new ProtocolSyntaxException("Invalid or empty URI");
         }
-        return new Request(line);
+        return new Request(new URI(line));
     }
 
     /**
@@ -94,7 +97,7 @@ public class Request {
      * @throws IOException
      */
     public void format(OutputStream requestOutput) throws IOException {
-        String request = uri + "\r\n";
+        String request = uri.toString() + "\r\n";
         requestOutput.write(request.getBytes(StandardCharsets.UTF_8));
         requestOutput.flush();
     }

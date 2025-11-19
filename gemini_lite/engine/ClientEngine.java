@@ -83,7 +83,7 @@ public class ClientEngine implements Engine {
             final var i = socket.getInputStream();
             final var o = socket.getOutputStream();
 
-            var request = new Request(current.toString());
+            var request = new Request(current);
             request.format(o);
 
             var reply = Reply.parse(i);

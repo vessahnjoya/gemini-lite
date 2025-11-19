@@ -21,7 +21,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
     @Override
     public Reply handle(Request request) {
         try {
-            var uri = new URI(request.getUri());
+            URI uri = request.getUri();
 
             if (!"gemini-lite://".equals(uri.getScheme())) {
                 return new Reply(59, "Invalid URI, does not contain expected scheme");
@@ -48,8 +48,6 @@ public class FileSystemRequestHandler implements ResourceHandler {
 
             return new Reply(20, mimeType);
 
-        } catch (URISyntaxException e) {
-            return new Reply(59, "Bad request");
         } catch (Exception e) {
             return new Reply(50, "Server crashed");
         }
@@ -95,27 +93,23 @@ public class FileSystemRequestHandler implements ResourceHandler {
 
     @Override
     public InputStream getData(Request request) throws IOException {
-        try {
-            var uri = new URI(request.getUri());
-            String str = uri.getPath();
+        var uri = request.getUri();
+        String str = uri.getPath();
 
-            if (str == null || str.isEmpty()) {
-                str = "/";
-            }
-
-            var requestedPath = resolvePath(str);
-
-            if (requestedPath == null || !Files.exists(requestedPath)) {
-                throw new ProtocolSyntaxException("File Not found");
-            }
-
-            if (!Files.isReadable(requestedPath)) {
-                throw new ProtocolSyntaxException("File is not readable");
-            }
-
-            return Files.newInputStream(requestedPath);
-        } catch (URISyntaxException e) {
-            throw new ProtocolSyntaxException("Invalid URI: " + e.getMessage());
+        if (str == null || str.isEmpty()) {
+            str = "/";
         }
+
+        var requestedPath = resolvePath(str);
+
+        if (requestedPath == null || !Files.exists(requestedPath)) {
+            throw new ProtocolSyntaxException("File Not found");
+        }
+
+        if (!Files.isReadable(requestedPath)) {
+            throw new ProtocolSyntaxException("File is not readable");
+        }
+
+        return Files.newInputStream(requestedPath);
     }
 }

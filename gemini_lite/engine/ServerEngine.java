@@ -57,7 +57,7 @@ public class ServerEngine implements Engine {
         }
     }
 
-    public void handleConnection(Socket socket) throws IOException {
+    public void handleConnection(Socket socket) throws IOException, URISyntaxException {
         Request request = null;
         Reply reply = null;
         var i = socket.getInputStream();
