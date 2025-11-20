@@ -1,8 +1,6 @@
 package engine;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.*;
 
 import handler.ResourceHandler;
@@ -60,22 +58,27 @@ public class ServerEngine implements Engine {
     public void handleConnection(Socket socket) throws IOException, URISyntaxException {
         Request request = null;
         Reply reply = null;
-        var i = socket.getInputStream();
-        var o = socket.getOutputStream();
-        try {
+        try (var i = socket.getInputStream();
+                var o = socket.getOutputStream();) {
+            try {
 
-            request = Request.parse(i);
-            reply = resourceHandler.handle(request);
+                request = Request.parse(i);
+                reply = resourceHandler.handle(request);
+
+            } catch (ProtocolSyntaxException e) {
+                reply = new Reply(59, "Bad Request");
+                System.err.println("Protocol error: " + e.getMessage());
+            } catch (IOException e) {
+                reply = new Reply(50, "Server error");
+                System.err.println("Unexpected Error: " + e.getMessage());
+            }
 
             reply.format(o);
-
-        } catch (ProtocolSyntaxException e) {
-            reply = new Reply(59, "Bad Request");
-            System.err.println("Protocol error: " + e.getMessage());
-        } catch (IOException e) {
-            reply = new Reply(50, "Server error");
-            System.err.println("Unexpected Error: " + e.getMessage());
+            o.flush();
+        } catch (Exception e) {
+            socket.close();
         }
+
     }
 
     private void sendErrorReply(Socket socket, Reply reply) throws IOException {
