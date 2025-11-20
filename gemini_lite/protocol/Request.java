@@ -52,7 +52,6 @@ public class Request {
         int count = 0;
         while (true) {
             int reader = in.read();
-            boolean flag = false;
             if (reader == -1) {
                 if (count == 0) {
                     throw new ProtocolSyntaxException("End of stream before request line");
@@ -61,19 +60,13 @@ public class Request {
             }
 
             if (reader == '\r') {
-                flag = true;
-                continue;
-            }
-
-            if (reader == '\n') {
-                if (flag) {
-                    throw new ProtocolSyntaxException("LF found without CR");
+                int next = in.read();
+                if (next != '\n') {
+                    throw new ProtocolSyntaxException("CR found without LF");
                 }
                 break;
-            }
-
-            if (flag) {
-                throw new ProtocolSyntaxException("Found CR without LF");
+            } else if (reader == '\n') {
+                throw new ProtocolSyntaxException("LF found without CR");
             }
 
             count++;
