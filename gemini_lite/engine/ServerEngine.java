@@ -1,6 +1,7 @@
 package engine;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.*;
 
 import handler.ResourceHandler;
@@ -66,11 +67,9 @@ public class ServerEngine implements Engine {
                 reply = resourceHandler.handle(request);
 
             } catch (ProtocolSyntaxException e) {
-                reply = new Reply(59, "Bad Request");
-                System.err.println("Protocol error: " + e.getMessage());
+                reply = new Reply(59, "Bad Request", InputStream.nullInputStream());
             } catch (IOException e) {
                 reply = new Reply(50, "Server error");
-                System.err.println("Unexpected Error: " + e.getMessage());
             }
 
             reply.format(o);
