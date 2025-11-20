@@ -68,8 +68,6 @@ public class ServerEngine implements Engine {
 
             } catch (ProtocolSyntaxException e) {
                 reply = new Reply(59, "Bad Request", InputStream.nullInputStream());
-            } catch (IOException e) {
-                reply = new Reply(50, "Server error");
             }
 
             reply.format(o);
