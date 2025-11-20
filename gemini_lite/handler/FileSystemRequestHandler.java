@@ -64,7 +64,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
                 return new Reply(20, mime, body);
             }
 
-            return new Reply(51, "Not Found");
+            return new Reply(59, "", InputStream.nullInputStream());
 
         } catch (Exception e) {
             return new Reply(50, "Server crashed");
