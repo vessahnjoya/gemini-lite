@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import protocol.*;
@@ -26,6 +25,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
     public Reply handle(Request request) {
         try {
             URI uri = request.getUri();
+            String pathString = uri.getPath();
 
             if (!"gemini-lite".equals(uri.getScheme())) {
                 return new Reply(59, "Invalid URI, does not contain expected scheme");
@@ -34,19 +34,21 @@ public class FileSystemRequestHandler implements ResourceHandler {
             if (uri.getUserInfo() != null) {
                 return new Reply(59, "User info not allowed");
             }
-            
-            String path = uri.getPath();
-            if (path == null || path.isEmpty()) {
-                path = "/";
-            }
-            Path requestedPath = resolvePath(path);
 
-            if (requestedPath == null) {
-                return new Reply(51, "Not Found");
+            if (uri.getFragment()!= null) {
+                return new Reply(59, "", InputStream.nullInputStream());
+            }
+
+            Path requestedPath;
+
+            if (pathString == null || pathString.isEmpty()|| pathString.equals("/")) {
+                requestedPath = path.resolve("index.gmi");
+            }else{
+                requestedPath = path.resolve(pathString.substring(1));
             }
 
             if (!Files.exists(requestedPath) || !Files.isReadable(requestedPath)) {
-                return new Reply(51, "Not Found");
+                return new Reply(51, "Not Found", InputStream.nullInputStream());
             }
 
             if (Files.isDirectory(requestedPath)) {
