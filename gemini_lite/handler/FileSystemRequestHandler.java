@@ -30,6 +30,11 @@ public class FileSystemRequestHandler implements ResourceHandler {
             if (!"gemini-lite".equals(uri.getScheme())) {
                 return new Reply(59, "Invalid URI, does not contain expected scheme");
             }
+
+            if (uri.getUserInfo() != null) {
+                return new Reply(59, "User info not allowed");
+            }
+            
             String path = uri.getPath();
             if (path == null || path.isEmpty()) {
                 path = "/";

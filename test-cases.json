@@ -1,0 +1,142 @@
+[
+    {
+        "type": "client",
+        "name": "Reject status codes above 59",
+        "url": "gemini-lite://localhost/high-status-code",
+        "input": false,
+        "transactions": [
+            {
+                "url": "gemini-lite://localhost/high-status-code",
+                "reply": "70 Not Allowed\r\n"
+            }
+        ],
+        "exitcode": 1,
+        "stdout": "",
+        "justification": "Status codes MUST be between 10 and 59 as per project manual. A client SHOULD reject any status code greater than 59. Here the server sends 60, so the client must treat this as a protocol syntax error and exit with error code 1, with nothing inside stdout."
+    },
+    {
+        "type": "client",
+        "name": "Reject status codes below 10",
+        "url": "gemini-lite://localhost/low-status-code",
+        "input": false,
+        "transactions": [
+            {
+                "url": "gemini-lite://localhost/low-status-code",
+                "reply": "09 Weird status\r\n"
+            }
+        ],
+        "exitcode": 1,
+        "stdout": "",
+        "justification": "Status codes MUST be between 10 and 59 as per project manual. A client SHOULD reject any status code less than 10 . Here the server sends 09, so the client must treat this as a protocol syntax error and exit with error code 1, with nothing inside stdout."
+    },
+    {
+        "type": "client",
+        "name": "Redirect followed by success",
+        "url": "gemini-lite://localhost:1965/redirect",
+        "input": false,
+        "transactions": [
+            {
+                "url": "gemini-lite://localhost:1965/redirect",
+                "reply": "30 gemini-lite://localhost:1965/target\r\n"
+            },
+            {
+                "url": "gemini-lite://localhost:1965/target",
+                "reply": "20 text/gemini\r\ncontent\r\n"
+            }
+        ],
+        "exitcode": 0,
+        "stdout": "content",
+        "justification": "Client MUST redirect if given a status code 30, in this case it should redirect 1 time. Hnece this test cases verifies redirect support. This is required by Gemini specification, section 'Redirection' of https://geminiprotocol.net/docs/protocol-specification.gmi which requires redictions"
+    },
+    {
+        "type": "client",
+        "name": "usage of user input",
+        "url": "gemini-lite://localhost:1965/search",
+        "input": "what is gemini protocol",
+        "transactions": [
+            {
+                "url": "gemini-lite://localhost:1965/search",
+                "reply": "10 Enter search query\r\n"
+            },
+            {
+                "url": "gemini-lite://localhost:1965/search??what%20is%20gemini%20protocol",
+                "reply": "20 text/gemini\r\n# Search Results\r\n\r\nYour query: what is gemini protocol\r\n\r\n=> /about/gemini protocol More about gemini protocol\r\n"
+            }
+        ],
+        "exitcode": 0,
+        "stdout": "# Search Results\r\n\r\nYour query: what is gemini protocol\r\n\r\n=> /about/gemini protocol More about gemini protocol\r\n",
+        "justification": "Tests correct handling of status code 10. When a second command-line argument is provided, a client MUST use it as the input value. The client MUST encode spaces as '%20'. It MUST append the encoded input as a new query, replacing any existing query even if the original URL had one. This is required by the Gemini specification, section on 'Input expected' of https://geminiprotocol.net/docs/protocol-specification.gmi"
+    },
+    {
+        "type": "server",
+        "name": "Reject overlong request URI (> 1024 bytes)",
+        "documents": {
+            "index.gmi": "# Hello\r\n"
+        },
+        "request": "gemini-lite://localhost/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\n",
+        "reply_regex": "^59( .*)?$",
+        "body": "",
+        "justification": "The request line URI must not exceed the maximum length specified in the protocol. This request uses a very long path, so the server should treat it as a bad request and respond with an error status 59 and an empty body."
+    },
+    {
+        "type": "server",
+        "name": "Reject URI with userinfo component",
+        "documents": {
+            "index.gmi": "# Hello\r\n"
+        },
+        "request": "gemini-lite://user@localhost/\r\n",
+        "reply_regex": "^59( .*)?$",
+        "body": "",
+        "justification": "Gemini URIs must not contain a userinfo component. The request URI includes 'user@' before the host, so the server must reject it and return an error response with code 59 and no body as writen in the 'overview' section of https://geminiprotocol.net/docs/protocol-specification.gmi"
+    },
+    {
+        "type": "server",
+        "name": "Reject URI containing a fragment",
+        "documents": {
+            "index.gmi": "# Root\r\n"
+        },
+        "request": "gemini-lite://localhost/path#fragment\r\n",
+        "reply_regex": "^59( .*)?$",
+        "body": "",
+        "justification": "Clients must not send a fragment identifier to the server. When a request URI contains a fragment, the server should treat it as invalid and respond with a 59 error and an empty body."
+    },
+    {
+        "type": "server",
+        "name": "Treat empty path as root index file",
+        "documents": {
+            "index.gmi": "# Root index\r\n"
+        },
+        "request": "gemini-lite://localhost\r\n",
+        "reply_regex": "^20 text/gemini.*$",
+        "body": "# Root index\r\n",
+        "justification": "An empty path in the request URI is equivalent to '/'. When the document root contains index.gmi, a request for gemini-lite://localhost must be served from that file, returning status 20 text/gemini and the file contents as written in the 'overview' section of https://geminiprotocol.net/docs/protocol-specification.gmi "
+    },
+    {
+        "type": "proxy",
+        "name": "Forward slow-down status from server unchanged",
+        "request": "gemini-lite://localhost/too-fast\r\n",
+        "server_transactions": [
+            {
+                "url": "gemini-lite://localhost/too-fast",
+                "reply": "44 Slow down\r\n"
+            }
+        ],
+        "reply_regex": "^44( .*)?$",
+        "body": "",
+        "justification": "When the server responds with a 44 slow-down status, the proxy must not hide or reinterpret it. It should relay the same status code and meta to its client, with no response body."
+    },
+    {
+        "type": "proxy",
+        "name": "Relay input request responses to the client",
+        "request": "gemini-lite://localhost/search\r\n",
+        "server_transactions": [
+            {
+                "url": "gemini-lite://localhost/search",
+                "reply": "10 Enter search term\r\n"
+            }
+        ],
+        "reply_regex": "^10 Enter search term$",
+        "body": "",
+        "justification": "Input (1x) responses require interaction with a user, which a proxy cannot perform on behalf of its clients. When the server replies with '10 Enter search term', the proxy must relay the same header to the client and not send any body."
+    }
+]
