@@ -48,7 +48,7 @@ public class ServerEngine implements Engine {
                     handleConnection(socket);
                 } catch (Exception e) {
                     System.err.println("Error handling connection: " + e.getMessage());
-                    if (socket != null || !socket.isClosed()) {
+                    if (socket.isClosed()) {
                         sendErrorReply(socket, new Reply(50, "Server Error"));
                     }
                 }
