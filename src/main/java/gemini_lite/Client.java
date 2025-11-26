@@ -20,10 +20,11 @@ public class Client {
         }
 
         var uri = new URI(args[0]);
+        String userInput = args[1];
         proxyEnv = System.getenv("GEMINI_LITE_PROXY");
 
         if (proxyEnv == null || proxyEnv.isEmpty()) {
-            engine = new ClientEngine(uri);
+            engine = new ClientEngine(uri, userInput);
         } else {
             String[] proxyParts = proxyEnv.split(":", 2);
             String host = proxyParts[0];

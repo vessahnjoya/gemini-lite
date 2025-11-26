@@ -22,6 +22,7 @@ public class ClientEngine implements Engine {
     private Socket socket;
     private InputStream in;
     private OutputStream out;
+    private String userInput;
 
     /**
      * Constructor to initialize URI
@@ -30,11 +31,11 @@ public class ClientEngine implements Engine {
      */
     public ClientEngine(URI uri) {
         this.uri = uri;
+    }
 
-        if (hasUserInfo()) {
-            System.err.println(" Invalid URI, URI should not contain UserInfo!");
-            System.exit(1);
-        }
+    public ClientEngine(URI uri, String userInput) {
+        this.uri = uri;
+        this.userInput = userInput;
     }
 
     public ClientEngine(Socket socket, URI uri) throws IOException {
@@ -77,6 +78,11 @@ public class ClientEngine implements Engine {
 
     @Override
     public void run() throws IOException {
+        if (hasUserInfo()) {
+            System.err.println(" Invalid URI, URI should not contain UserInfo!");
+            System.exit(1);
+        }
+
         if (socket == null) {
             var host = getHost(uri);
             var port = getPort(uri);
@@ -154,19 +160,22 @@ public class ClientEngine implements Engine {
             handleRedirect(current, count, reply.getMeta().trim());
         } else if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
             System.out.println(reply.getMeta());
-            var reader = new BufferedReader(new InputStreamReader(System.in));
-            String userInput = reader.readLine();
-            String encodedInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8.toString()).replace("+", "%20");
-            URI newuri;
-            try {
-                newuri = utils.URIutils.buildNewURI(current, encodedInput);
-            } catch (Exception e) {
-                System.err.println("invalid query");
+            if (userInput != null) {
+                String encodedInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8.toString()).replace("+",
+                        "%20");
+                URI newuri;
+                try {
+                    newuri = utils.URIutils.buildNewURI(current, encodedInput);
+                } catch (Exception e) {
+                    System.err.println("invalid query");
+                    System.exit(1);
+                    return;
+                }
+                runWithRedirect(newuri, count + 1);
+            }else{
+                System.out.flush();
                 System.exit(1);
-                return;
             }
-
-            runWithRedirect(newuri, count + 1);
 
         } else {
             System.out.flush();
