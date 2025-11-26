@@ -1,9 +1,13 @@
 package engine;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
+
 import protocol.*;
 
 /**
@@ -91,22 +95,22 @@ public class ClientEngine implements Engine {
         }
 
         if (count == 0 && socket != null) {
-            try ( var currentSocket = socket;
-            var currentIn = currentSocket.getInputStream();
-            var currentOut = currentSocket.getOutputStream();) {
+            try (var currentSocket = socket;
+                    var currentIn = currentSocket.getInputStream();
+                    var currentOut = currentSocket.getOutputStream();) {
                 processRequest(current, currentIn, currentOut, count);
             }
-        } else{
+        } else {
             try (var currentSocket = new Socket(getHost(current), getPort(current));
-            var currentIn = currentSocket.getInputStream();
-            var currentOut = currentSocket.getOutputStream();) {
+                    var currentIn = currentSocket.getInputStream();
+                    var currentOut = currentSocket.getOutputStream();) {
                 processRequest(current, currentIn, currentOut, count);
             }
         }
 
     }
 
-    private void HandleRedirect(URI current, int count, String meta) throws IOException {
+    private void handleRedirect(URI current, int count, String meta) throws IOException {
         URI target;
         try {
             target = new URI(meta);
@@ -128,29 +132,45 @@ public class ClientEngine implements Engine {
         runWithRedirect(target, count + 1);
     }
 
-    private void processRequest(URI current, InputStream in, OutputStream out, int count) throws IOException{
+    private void processRequest(URI current, InputStream in, OutputStream out, int count) throws IOException {
         Request request = new Request(current);
-            request.format(out);
+        request.format(out);
 
-            Reply reply = Reply.parse(in);
+        Reply reply = Reply.parse(in);
 
-            if (reply.getStatusCode() == 20) {
-                if (reply.hasBody()) {
-                    reply.relayBody(System.out);
-                } else {
-                    byte[] buffer = new byte[1024];
-                    int read;
-                    while ((read = in.read(buffer)) != -1) {
-                        System.out.write(buffer, 0, read);
-                    }
-                }
-                System.out.flush();
-                System.exit(0);
-            } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
-                HandleRedirect(current, count, reply.getMeta().trim());
+        if (reply.getStatusCode() == 20) {
+            if (reply.hasBody()) {
+                reply.relayBody(System.out);
             } else {
-                System.out.flush();
-                System.exit(1);
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    System.out.write(buffer, 0, read);
+                }
             }
+            System.out.flush();
+            System.exit(0);
+        } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+            handleRedirect(current, count, reply.getMeta().trim());
+        } else if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
+            System.out.println(reply.getMeta());
+            var reader = new BufferedReader(new InputStreamReader(System.in));
+            String userInput = reader.readLine();
+            String encodedInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8.toString()).replace("+", "%20");
+            URI newuri;
+            try {
+                newuri = utils.URIutils.buildNewURI(current, encodedInput);
+            } catch (Exception e) {
+                System.err.println("invalid query");
+                System.exit(1);
+                return;
+            }
+
+            runWithRedirect(newuri, count + 1);
+
+        } else {
+            System.out.flush();
+            System.exit(1);
+        }
     }
 }
