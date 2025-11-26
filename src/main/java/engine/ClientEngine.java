@@ -150,7 +150,7 @@ public class ClientEngine implements Engine {
                 HandleRedirect(current, count, reply.getMeta().trim());
             } else {
                 System.out.flush();
-                System.exit(50);
+                System.exit(0);
             }
     }
 }
