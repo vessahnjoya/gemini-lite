@@ -87,15 +87,6 @@ public class ProxyEngine implements Engine {
         }
     }
 
-    private void relayBody(BufferedInputStream input, BufferedOutputStream output) throws IOException {
-        byte[] buffer = new byte[1024];
-        int read;
-        while ((read = input.read(buffer)) != 1) {
-            output.write(buffer, 0, read);
-            output.flush();
-        }
-    }
-
     private void communicationBetweenSockets(BufferedInputStream clientIn, BufferedOutputStream clientOut,
             BufferedInputStream input, BufferedOutputStream output) {
         var t1 = new Thread(() -> {

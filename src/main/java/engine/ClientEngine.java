@@ -71,19 +71,6 @@ public class ClientEngine implements Engine {
         return current.getHost();
     }
 
-    private Socket getSocket() throws UnknownHostException, IOException {
-        return new Socket(getHost(uri), getPort(uri));
-    }
-
-    private void reader(InputStream i) throws IOException {
-        byte[] buffer = new byte[1024];
-        int read;
-        while ((read = i.read(buffer)) != -1) {
-            System.out.write(buffer, 0, read);
-        }
-        System.out.print("\r\n");
-    }
-
     @Override
     public void run() throws IOException {
         if (socket == null) {
@@ -146,8 +133,6 @@ public class ClientEngine implements Engine {
             request.format(out);
 
             Reply reply = Reply.parse(in);
-
-            System.out.print(reply.getStatusCode() + " " + reply.getMeta() + "\r\n");
 
             if (reply.getStatusCode() == 20) {
                 if (reply.hasBody()) {
