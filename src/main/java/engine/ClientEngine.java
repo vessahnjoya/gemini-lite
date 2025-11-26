@@ -172,9 +172,6 @@ public class ClientEngine implements Engine {
                     return;
                 }
                 runWithRedirect(newuri, count + 1);
-            }else{
-                System.out.flush();
-                System.exit(1);
             }
 
         } else {
