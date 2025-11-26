@@ -72,7 +72,11 @@ public class ProxyEngine implements Engine {
                     reply.format(clientOut);
                     replySent = true;
 
-                    if (reply.isInputReply()) {
+                    if (reply.getStatusCode() == 20) {
+                        reply.relayBody(clientOut);
+                        clientOut.flush();
+                        return;
+                    } else if (reply.isInputReply()) {
                         communicationBetweenSockets(clientIin, clientOut, in, out);
                         return;
                     }
@@ -100,6 +104,15 @@ public class ProxyEngine implements Engine {
             System.err.println("Failed to send proxy Error");
             System.exit(1);
         }
+    }
+
+    private void sendErrorReply(OutputStream out, Reply reply) {
+        try {
+            reply.format(out);
+            out.flush();
+        } catch (IOException e) {
+        }
+
     }
 
     private void communicationBetweenSockets(BufferedInputStream clientIn, BufferedOutputStream clientOut,
