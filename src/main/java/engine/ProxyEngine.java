@@ -3,8 +3,6 @@ package engine;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-
 import protocol.Reply;
 import protocol.Request;
 
@@ -42,6 +40,8 @@ public class ProxyEngine implements Engine {
                 port = DEFAULT_PORT;
             }
 
+            boolean replySent = false;
+
             try (var socket = new Socket()) {
                 socket.connect(new InetSocketAddress(host, port));
                 try (var in = new BufferedInputStream(socket.getInputStream());
@@ -56,6 +56,7 @@ public class ProxyEngine implements Engine {
                     }
 
                     reply.format(clientOut);
+                    replySent = true;
 
                     if (reply.isInputReply()) {
                         communicationBetweenSockets(clientIin, clientOut, in, out);
@@ -64,15 +65,14 @@ public class ProxyEngine implements Engine {
 
                     if (reply.hasBody()) {
                         reply.relayBody(clientOut);
-                    } else {
-                        relayBody(in, clientOut);
                     }
 
                 } catch (Exception e) {
-                    sendProxyError(clientOut, "proxy error: cannot connect to client");
-                }
-            } catch (IOException e) {
+                    if (!replySent) {
 
+                        sendProxyError(clientOut, "proxy error: cannot connect to client");
+                    }
+                }
             }
 
         }
