@@ -27,6 +27,8 @@ public class ProxyEngine implements Engine {
                 request = Request.parse(clientIin);
             } catch (Exception e) {
                 sendProxyError(clientOut, "Proxy error: invalid request");
+                clientOut.flush();
+                return;
             }
 
             var target = request.getUri();
@@ -34,6 +36,8 @@ public class ProxyEngine implements Engine {
 
             if (host == null || host.isEmpty()) {
                 sendProxyError(clientOut, "Proxy error: missing host");
+                clientOut.flush();
+                return;
             }
 
             int port = target.getPort();
@@ -81,6 +85,7 @@ public class ProxyEngine implements Engine {
                 } catch (Exception e) {
                     if (!replySent) {
                         sendProxyError(clientOut, "proxy error: cannot connect to client");
+                        clientOut.flush();
                     }
                 }
             }
