@@ -60,6 +60,10 @@ public class ClientEngine implements Engine {
         return current.getHost();
     }
 
+    private Socket getSocket() throws UnknownHostException, IOException{
+        return new Socket(getHost(uri), getPort(uri));
+    }
+
     private void reader(InputStream i) throws IOException {
         byte[] buffer = new byte[1024];
         int read;

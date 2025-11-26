@@ -32,34 +32,34 @@
     {
         "type": "client",
         "name": "Redirect followed by success",
-        "url": "gemini-lite://localhost:1965/redirect",
+        "url": "gemini-lite://localhost:1958/redirect",
         "input": false,
         "transactions": [
             {
-                "url": "gemini-lite://localhost:1965/redirect",
-                "reply": "30 gemini-lite://localhost:1965/target\r\n"
+                "url": "gemini-lite://localhost:1958/redirect",
+                "reply": "30 gemini-lite://localhost:1958/target\r\n"
             },
             {
-                "url": "gemini-lite://localhost:1965/target",
+                "url": "gemini-lite://localhost:1958/target",
                 "reply": "20 text/gemini\r\ncontent\r\n"
             }
         ],
         "exitcode": 0,
-        "stdout": "content",
+        "stdout": "content\r\n",
         "justification": "Client MUST redirect if given a status code 30, in this case it should redirect 1 time. Hnece this test cases verifies redirect support. This is required by Gemini specification, section 'Redirection' of https://geminiprotocol.net/docs/protocol-specification.gmi which requires redictions"
     },
     {
         "type": "client",
         "name": "usage of user input",
-        "url": "gemini-lite://localhost:1965/search",
+        "url": "gemini-lite://localhost:1958/search",
         "input": "what is gemini protocol",
         "transactions": [
             {
-                "url": "gemini-lite://localhost:1965/search",
+                "url": "gemini-lite://localhost:1958/search",
                 "reply": "10 Enter search query\r\n"
             },
             {
-                "url": "gemini-lite://localhost:1965/search??what%20is%20gemini%20protocol",
+                "url": "gemini-lite://localhost:1958/search??what%20is%20gemini%20protocol",
                 "reply": "20 text/gemini\r\n# Search Results\r\n\r\nYour query: what is gemini protocol\r\n\r\n=> /about/gemini protocol More about gemini protocol\r\n"
             }
         ],

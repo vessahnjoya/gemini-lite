@@ -130,4 +130,19 @@ public class Reply {
         replyOutput.flush();
     }
 
+    public boolean isInputReply() {
+        return statusCode >= 10 && statusCode < 20;
+    }
+
+    public void relayBody(BufferedOutputStream out) throws IOException {
+        if (hasBody()) {
+            body.transferTo(out);
+            body.close();
+        }
+    }
+
+    public boolean hasBody() {
+        return body != null;
+    }
+
 }
