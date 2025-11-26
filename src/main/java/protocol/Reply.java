@@ -134,7 +134,7 @@ public class Reply {
         return statusCode >= 10 && statusCode < 20;
     }
 
-    public void relayBody(BufferedOutputStream out) throws IOException {
+    public void relayBody(OutputStream out) throws IOException {
         if (hasBody()) {
             body.transferTo(out);
             body.close();

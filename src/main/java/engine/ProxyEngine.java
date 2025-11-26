@@ -119,7 +119,7 @@ public class ProxyEngine implements Engine {
             try {
                 byte[] buffer = new byte[1024];
                 int read;
-                while ((read = clientIn.read(buffer)) != 1) {
+                while ((read = input.read(buffer)) != 1) {
                     clientOut.write(buffer, 0, read);
                     clientOut.flush();
                 }

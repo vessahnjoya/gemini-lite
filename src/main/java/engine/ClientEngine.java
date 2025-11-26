@@ -2,6 +2,7 @@ package engine;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.*;
 import protocol.*;
 
@@ -14,6 +15,9 @@ public class ClientEngine implements Engine {
     private final URI uri;
     private final int MAX_REDIRECTS = 5;
     private final int DEFAULT_PORT = 1958;
+    private Socket socket;
+    private InputStream in;
+    private OutputStream out;
 
     /**
      * Constructor to initialize URI
@@ -27,6 +31,13 @@ public class ClientEngine implements Engine {
             System.err.println(" Invalid URI, URI should not contain UserInfo!");
             System.exit(1);
         }
+    }
+
+    public ClientEngine(Socket socket, URI uri) throws IOException {
+        this.socket = socket;
+        this.uri = uri;
+        in = socket.getInputStream();
+        out = socket.getOutputStream();
     }
 
     /**
@@ -60,7 +71,7 @@ public class ClientEngine implements Engine {
         return current.getHost();
     }
 
-    private Socket getSocket() throws UnknownHostException, IOException{
+    private Socket getSocket() throws UnknownHostException, IOException {
         return new Socket(getHost(uri), getPort(uri));
     }
 
@@ -75,6 +86,14 @@ public class ClientEngine implements Engine {
 
     @Override
     public void run() throws IOException {
+        if (socket == null) {
+            var host = getHost(uri);
+            var port = getPort(uri);
+            socket = new Socket(host, port);
+            in = socket.getInputStream();
+            out = socket.getOutputStream();
+        }
+
         runWithRedirect(uri, 0);
     }
 
@@ -83,32 +102,21 @@ public class ClientEngine implements Engine {
             System.err.println("Maximum redirects amount reached");
             System.exit(1);
         }
-        try (var socket = new Socket(getHost(current), getPort(current))) {
-            final var i = socket.getInputStream();
-            final var o = socket.getOutputStream();
 
-            var request = new Request(current);
-            request.format(o);
-
-            var reply = Reply.parse(i);
-
-            System.out.print(reply.getStatusCode() + " " + reply.getMeta() + "\r\n");
-
-            if (reply.getStatusCode() == 20) {
-                reader(i);
-                System.out.flush();
-                System.exit(0);
-            } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
-                HandleRedirect(current, count, reply.getMeta().trim());
-            } else {
-                System.out.flush();
-                System.exit(1);
+        if (count == 0 && socket != null) {
+            try ( var currentSocket = socket;
+            var currentIn = currentSocket.getInputStream();
+            var currentOut = currentSocket.getOutputStream();) {
+                processRequest(current, currentIn, currentOut, count);
             }
-
-        } catch (UnknownHostException e) {
-            System.err.println("Invalid HostName: " + e.getMessage());
-            System.exit(1);
+        } else{
+            try (var currentSocket = new Socket(getHost(current), getPort(current));
+            var currentIn = currentSocket.getInputStream();
+            var currentOut = currentSocket.getOutputStream();) {
+                processRequest(current, currentIn, currentOut, count);
+            }
         }
+
     }
 
     private void HandleRedirect(URI current, int count, String meta) throws IOException {
@@ -131,5 +139,33 @@ public class ClientEngine implements Engine {
         }
 
         runWithRedirect(target, count + 1);
+    }
+
+    private void processRequest(URI current, InputStream in, OutputStream out, int count) throws IOException{
+        Request request = new Request(current);
+            request.format(out);
+
+            Reply reply = Reply.parse(in);
+
+            System.out.print(reply.getStatusCode() + " " + reply.getMeta() + "\r\n");
+
+            if (reply.getStatusCode() == 20) {
+                if (reply.hasBody()) {
+                    reply.relayBody(System.out);
+                } else {
+                    byte[] buffer = new byte[1024];
+                    int read;
+                    while ((read = in.read(buffer)) != -1) {
+                        System.out.write(buffer, 0, read);
+                    }
+                }
+                System.out.flush();
+                System.exit(0);
+            } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+                HandleRedirect(current, count, reply.getMeta().trim());
+            } else {
+                System.out.flush();
+                System.exit(1);
+            }
     }
 }

@@ -34,6 +34,16 @@ public class Client {
                 System.exit(1);
                 return;
             }
+
+            try(var proxySocket = new Socket(host, port)) {
+                engine = new ClientEngine( proxySocket,uri);
+                engine.run();
+                return;
+            } catch (Exception e) {
+                System.err.println("Error connecting to proxy: " + e.getMessage());
+                System.exit(1);
+                return;
+            }
         }
 
         engine.run();
