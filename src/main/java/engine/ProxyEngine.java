@@ -48,7 +48,9 @@ public class ProxyEngine implements Engine {
                 try {
                     socket.connect(new InetSocketAddress(host, port));
                 } catch (UnknownHostException e) {
-                    sendProxyError(clientOut, "proxy error: host not found");
+                    sendProxyError(clientOut, "proxy error: cannot connect");
+                    clientOut.flush();
+                    return;
                 }
 
                 try (var in = new BufferedInputStream(socket.getInputStream());
@@ -59,6 +61,7 @@ public class ProxyEngine implements Engine {
                         reply = Reply.parse(in);
                     } catch (Exception e) {
                         sendProxyError(clientOut, "proxy error: Invalid Client");
+                        clientOut.flush();
                         return;
                     }
 
