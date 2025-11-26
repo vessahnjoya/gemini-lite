@@ -20,7 +20,7 @@ public class Proxy {
         var executor = Executors.newCachedThreadPool();
 
         try (var serverSocket = new ServerSocket(port)) {
-            System.out.println("listening on port " + port);
+            System.out.print("listening on port " + port + "\r\n");
             while (true) {
                 var clientSocket = serverSocket.accept();
 

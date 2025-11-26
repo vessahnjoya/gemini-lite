@@ -3,6 +3,8 @@ package engine;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
+
 import protocol.Reply;
 import protocol.Request;
 
@@ -43,7 +45,12 @@ public class ProxyEngine implements Engine {
             boolean replySent = false;
 
             try (var socket = new Socket()) {
-                socket.connect(new InetSocketAddress(host, port));
+                try {
+                    socket.connect(new InetSocketAddress(host, port));
+                } catch (UnknownHostException e) {
+                    sendProxyError(clientOut, "proxy error: host not found");
+                }
+
                 try (var in = new BufferedInputStream(socket.getInputStream());
                         var out = new BufferedOutputStream(socket.getOutputStream())) {
                     request.format(out);
@@ -65,11 +72,11 @@ public class ProxyEngine implements Engine {
 
                     if (reply.hasBody()) {
                         reply.relayBody(clientOut);
+                        clientOut.flush();
                     }
 
                 } catch (Exception e) {
                     if (!replySent) {
-
                         sendProxyError(clientOut, "proxy error: cannot connect to client");
                     }
                 }
