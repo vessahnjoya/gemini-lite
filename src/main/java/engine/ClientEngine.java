@@ -146,7 +146,7 @@ public class ClientEngine implements Engine {
 
         if (reply.getStatusCode() == 20) {
             if (reply.hasBody()) {
-                reply.relayBody(System.out);
+                reply.relayBody(out);
             } else {
                 byte[] buffer = new byte[1024];
                 int read;
