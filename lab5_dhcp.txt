@@ -1,0 +1,229 @@
+Frame 17: Packet, 342 bytes on wire (2736 bits), 342 bytes captured (2736 bits) on interface en0, id 0
+    Section number: 1
+    Interface id: 0 (en0)
+        Interface name: en0
+        Interface description: Wi-Fi
+    Encapsulation type: Ethernet (1)
+    Arrival Time: Nov 27, 2025 12:06:11.266420000 CET
+    UTC Arrival Time: Nov 27, 2025 11:06:11.266420000 UTC
+    Epoch Arrival Time: 1764241571.266420000
+    [Time shift for this packet: 0.000000000 seconds]
+    [Time delta from previous captured frame: 466.000 microseconds]
+    [Time since reference or first frame: 2.323000 milliseconds]
+    Frame Number: 17
+    Frame Length: 342 bytes (2736 bits)
+    Capture Length: 342 bytes (2736 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: eth:ethertype:ip:udp:dhcp]
+    Character encoding: ASCII (0)
+    [Coloring Rule Name: UDP]
+    [Coloring Rule String: udp]
+Ethernet II, Src: 5e:05:18:37:73:a2 (5e:05:18:37:73:a2), Dst: Broadcast (ff:ff:ff:ff:ff:ff)
+    Destination: Broadcast (ff:ff:ff:ff:ff:ff)
+        .... ..1. .... .... .... .... = LG bit: Locally administered address (this is NOT the factory default)
+        .... ...1 .... .... .... .... = IG bit: Group address (multicast/broadcast)
+    Source: 5e:05:18:37:73:a2 (5e:05:18:37:73:a2)
+        .... ..1. .... .... .... .... = LG bit: Locally administered address (this is NOT the factory default)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+    Type: IPv4 (0x0800)
+    [Stream index: 6]
+Internet Protocol Version 4, Src: 0.0.0.0, Dst: 255.255.255.255
+    0100 .... = Version: 4
+    .... 0101 = Header Length: 20 bytes (5)
+    Differentiated Services Field: 0x00 (DSCP: CS0, ECN: Not-ECT)
+        0000 00.. = Differentiated Services Codepoint: Default (0)
+        .... ..00 = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+    Total Length: 328
+    Identification: 0x335c (13148)
+    000. .... = Flags: 0x0
+        0... .... = Reserved bit: Not set
+        .0.. .... = Don't fragment: Not set
+        ..0. .... = More fragments: Not set
+    ...0 0000 0000 0000 = Fragment Offset: 0
+    Time to Live: 255
+    Protocol: UDP (17)
+    Header Checksum: 0x8749 [validation disabled]
+    [Header checksum status: Unverified]
+    Source Address: 0.0.0.0
+    Destination Address: 255.255.255.255
+    [Stream index: 3]
+User Datagram Protocol, Src Port: 68, Dst Port: 67
+    Source Port: 68
+    Destination Port: 67
+    Length: 308
+    Checksum: 0x1b8e [unverified]
+    [Checksum Status: Unverified]
+    [Stream index: 9]
+    [Stream Packet Number: 1]
+    [Timestamps]
+        [Time since first frame: 0.000000000 seconds]
+        [Time since previous frame: 0.000000000 seconds]
+    UDP payload (300 bytes)
+Dynamic Host Configuration Protocol (Request)
+    Message type: Boot Request (1)
+    Hardware type: Ethernet (0x01)
+    Hardware address length: 6
+    Hops: 0
+    Transaction ID: 0x5d98217f
+    Seconds elapsed: 0
+    Bootp flags: 0x0000 (Unicast)
+        0... .... .... .... = Broadcast flag: Unicast
+        .000 0000 0000 0000 = Reserved flags: 0x0000
+    Client IP address: 0.0.0.0
+    Your (client) IP address: 0.0.0.0
+    Next server IP address: 0.0.0.0
+    Relay agent IP address: 0.0.0.0
+    Client MAC address: 5e:05:18:37:73:a2 (5e:05:18:37:73:a2)
+    Client hardware address padding: 00000000000000000000
+    Server host name not given
+    Boot file name not given
+    Magic cookie: DHCP
+    Option: (53) DHCP Message Type (Request)
+        Length: 1
+        DHCP: Request (3)
+    Option: (55) Parameter Request List
+        Length: 13
+        Parameter Request List Item: (1) Subnet Mask
+        Parameter Request List Item: (121) Classless Static Route
+        Parameter Request List Item: (3) Router
+        Parameter Request List Item: (6) Domain Name Server
+        Parameter Request List Item: (15) Domain Name
+        Parameter Request List Item: (108) IPv6-Only Preferred
+        Parameter Request List Item: (114) DHCP Captive-Portal
+        Parameter Request List Item: (119) Domain Search
+        Parameter Request List Item: (162) Unassigned
+        Parameter Request List Item: (252) Private/Proxy autodiscovery
+        Parameter Request List Item: (95) LDAP [TODO:RFC3679]
+        Parameter Request List Item: (44) NetBIOS over TCP/IP Name Server
+        Parameter Request List Item: (46) NetBIOS over TCP/IP Node Type
+    Option: (57) Maximum DHCP Message Size
+        Length: 2
+        Maximum DHCP Message Size: 1500
+    Option: (61) Client identifier
+        Length: 7
+        Hardware type: Ethernet (0x01)
+        Client MAC address: 5e:05:18:37:73:a2 (5e:05:18:37:73:a2)
+    Option: (50) Requested IP Address (10.2.2.169)
+        Length: 4
+        Requested IP Address: 10.2.2.169
+    Option: (51) IP Address Lease Time
+        Length: 4
+        IP Address Lease Time: 90 days (7776000)
+    Option: (12) Host Name
+        Length: 3
+        Host Name: Mac
+    Option: (255) End
+        Option End: 255
+    Padding: 0000000000000000000000
+
+
+Frame 54: Packet, 342 bytes on wire (2736 bits), 342 bytes captured (2736 bits) on interface en0, id 0
+    Section number: 1
+    Interface id: 0 (en0)
+        Interface name: en0
+        Interface description: Wi-Fi
+    Encapsulation type: Ethernet (1)
+    Arrival Time: Nov 27, 2025 12:06:11.481853000 CET
+    UTC Arrival Time: Nov 27, 2025 11:06:11.481853000 UTC
+    Epoch Arrival Time: 1764241571.481853000
+    [Time shift for this packet: 0.000000000 seconds]
+    [Time delta from previous captured frame: 39.156000 milliseconds]
+    [Time delta from previous displayed frame: 215.433000 milliseconds]
+    [Time since reference or first frame: 217.756000 milliseconds]
+    Frame Number: 54
+    Frame Length: 342 bytes (2736 bits)
+    Capture Length: 342 bytes (2736 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: eth:ethertype:ip:udp:dhcp]
+    Character encoding: ASCII (0)
+    [Coloring Rule Name: UDP]
+    [Coloring Rule String: udp]
+Ethernet II, Src: RaspberryPi_32:7f:67 (2c:cf:67:32:7f:67), Dst: 5e:05:18:37:73:a2 (5e:05:18:37:73:a2)
+    Destination: 5e:05:18:37:73:a2 (5e:05:18:37:73:a2)
+        .... ..1. .... .... .... .... = LG bit: Locally administered address (this is NOT the factory default)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+    Source: RaspberryPi_32:7f:67 (2c:cf:67:32:7f:67)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+    Type: IPv4 (0x0800)
+    [Stream index: 0]
+Internet Protocol Version 4, Src: 10.2.0.1, Dst: 10.2.2.169
+    0100 .... = Version: 4
+    .... 0101 = Header Length: 20 bytes (5)
+    Differentiated Services Field: 0x10 (DSCP: Unknown, ECN: Not-ECT)
+        0001 00.. = Differentiated Services Codepoint: Unknown (4)
+        .... ..00 = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+    Total Length: 328
+    Identification: 0x0000 (0)
+    000. .... = Flags: 0x0
+        0... .... = Reserved bit: Not set
+        .0.. .... = Don't fragment: Not set
+        ..0. .... = More fragments: Not set
+    ...0 0000 0000 0000 = Fragment Offset: 0
+    Time to Live: 128
+    Protocol: UDP (17)
+    Header Checksum: 0x22e8 [validation disabled]
+    [Header checksum status: Unverified]
+    Source Address: 10.2.0.1
+    Destination Address: 10.2.2.169
+    [Stream index: 0]
+User Datagram Protocol, Src Port: 67, Dst Port: 68
+    Source Port: 67
+    Destination Port: 68
+    Length: 308
+    Checksum: 0xfa00 [unverified]
+    [Checksum Status: Unverified]
+    [Stream index: 10]
+    [Stream Packet Number: 1]
+    [Timestamps]
+        [Time since first frame: 0.000000000 seconds]
+        [Time since previous frame: 0.000000000 seconds]
+    UDP payload (300 bytes)
+Dynamic Host Configuration Protocol (ACK)
+    Message type: Boot Reply (2)
+    Hardware type: Ethernet (0x01)
+    Hardware address length: 6
+    Hops: 0
+    Transaction ID: 0x5d98217f
+    Seconds elapsed: 0
+    Bootp flags: 0x0000 (Unicast)
+        0... .... .... .... = Broadcast flag: Unicast
+        .000 0000 0000 0000 = Reserved flags: 0x0000
+    Client IP address: 0.0.0.0
+    Your (client) IP address: 10.2.2.169
+    Next server IP address: 0.0.0.0
+    Relay agent IP address: 0.0.0.0
+    Client MAC address: 5e:05:18:37:73:a2 (5e:05:18:37:73:a2)
+    Client hardware address padding: 00000000000000000000
+    Server host name not given
+    Boot file name not given
+    Magic cookie: DHCP
+    Option: (53) DHCP Message Type (ACK)
+        Length: 1
+        DHCP: ACK (5)
+    Option: (54) DHCP Server Identifier (10.2.0.1)
+        Length: 4
+        DHCP Server Identifier: 10.2.0.1
+    Option: (51) IP Address Lease Time
+        Length: 4
+        IP Address Lease Time: 5 hours (18000)
+    Option: (1) Subnet Mask (255.255.252.0)
+        Length: 4
+        Subnet Mask: 255.255.252.0
+    Option: (3) Router
+        Length: 4
+        Router: 10.2.0.3
+    Option: (6) Domain Name Server
+        Length: 4
+        Domain Name Server: 10.2.0.1
+    Option: (15) Domain Name
+        Length: 5
+        Domain Name: kale.
+    Option: (119) Domain Search
+        Length: 6
+        FQDN: kale
+    Option: (255) End
+        Option End: 255
+    Padding: 0000000000000000000000

@@ -20,11 +20,21 @@ public class Client {
         }
 
         var uri = new URI(args[0]);
-        String userInput = args[1];
+        String userInput = null;
+        try{
+            userInput = args[1];
+        }catch(Exception e){
+            // System.err.println("running without user input");
+        }
         proxyEnv = System.getenv("GEMINI_LITE_PROXY");
 
         if (proxyEnv == null || proxyEnv.isEmpty()) {
-            engine = new ClientEngine(uri, userInput);
+            if (userInput != null) {
+                engine = new ClientEngine(uri, userInput);
+            }else{
+                engine = new ClientEngine(uri);
+            }
+            
         } else {
             String[] proxyParts = proxyEnv.split(":", 2);
             String host = proxyParts[0];
@@ -45,6 +55,7 @@ public class Client {
                 System.exit(1);
                 return;
             }
+            
         }
 
         engine.run();
