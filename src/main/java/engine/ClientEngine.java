@@ -1,10 +1,6 @@
 package engine;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 
@@ -20,8 +16,6 @@ public class ClientEngine implements Engine {
     private final int MAX_REDIRECTS = 5;
     private final int DEFAULT_PORT = 1958;
     private Socket socket;
-    private InputStream in;
-    private OutputStream out;
     private String userInput;
 
     /**
@@ -41,8 +35,8 @@ public class ClientEngine implements Engine {
     public ClientEngine(Socket socket, URI uri) throws IOException {
         this.socket = socket;
         this.uri = uri;
-        in = socket.getInputStream();
-        out = socket.getOutputStream();
+        // in = socket.getInputStream();
+        // out = socket.getOutputStream();
     }
 
     /**
@@ -87,8 +81,8 @@ public class ClientEngine implements Engine {
             var host = getHost(uri);
             var port = getPort(uri);
             socket = new Socket(host, port);
-            in = socket.getInputStream();
-            out = socket.getOutputStream();
+            // var in = socket.getInputStream();
+            // var out = socket.getOutputStream();
         }
 
         runWithRedirect(uri, 0);
