@@ -44,6 +44,12 @@ Student ID number: i6371413
 
 ### Lab4
 
+#### Step 1
+
+Final content of `/var/lib/bind/db.zone.lab-kale`
+
+![alt text](report-images/db.zone.lab-kale.png)
+
 #### Step 2
 
 - Running `dig -t ns lab-kale` to retrieve all domain name server (ns) records associated with the domain lab-kale.
