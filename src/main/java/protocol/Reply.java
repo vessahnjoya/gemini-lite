@@ -49,8 +49,7 @@ public class Reply {
                     flag = false;
                     break;
                 }
-                buffer.write(reader);
-                flag = false;
+                throw new ProtocolSyntaxException("End of stream missing line terminator");
             }
 
             if (reader == '\r') {
@@ -59,7 +58,7 @@ public class Reply {
             }
 
             if (reader == '\n') {
-                break;
+                throw new ProtocolSyntaxException("End of stream missing line terminator");
             }
 
             buffer.write(reader);
@@ -68,15 +67,45 @@ public class Reply {
 
         String line = buffer.toString(StandardCharsets.UTF_8);
 
-        if (line.length() < 3 || !Character.isDigit(line.charAt(0)) || !Character.isDigit(line.charAt(1))
-                || line.charAt(2) != ' ') {
+        if (line.length() < 2 || !Character.isDigit(line.charAt(0)) || !Character.isDigit(line.charAt(1))) {
             throw new ProtocolSyntaxException("Invalid reply format: " + line);
         }
 
         int statusCode = Integer.parseInt(line.substring(0, 2));
-        String meta = line.substring(3);
+        String meta = "";
 
-        if (meta.getBytes(StandardCharsets.UTF_8).length > 1024) {
+        if (line.length() == 2) {
+            meta = "";
+        }else{
+            if (line.charAt(2) != ' ') {
+                throw new ProtocolSyntaxException("Invalid reply format: " + line);
+            }
+            if (line.length() == 3) {
+                throw new ProtocolSyntaxException("Invalid reply format: " + line);
+            }
+            if (!line.substring(3).trim().isEmpty()) {
+                meta = line.substring(3);
+            }else{
+                throw new ProtocolSyntaxException("Invalid reply format: " + line);
+            }
+        }
+
+        for (int i = 0; i < meta.length(); i++) {
+            char character = meta.charAt(i);
+            if (character >= 0x80 && character <= 0x9F) {
+                throw new ProtocolSyntaxException("Meta contains C1 control");
+            }
+        }
+
+        if (statusCode == 20) {
+            if (meta == null || meta.isEmpty() || !meta.contains("/") ) {
+                throw new ProtocolSyntaxException("Missing MIME type");
+            }
+        }
+
+        byte[] metaBytes = meta.getBytes(StandardCharsets.UTF_8);
+
+        if (metaBytes.length > 1024) {
             throw new ProtocolSyntaxException("Meta exceeds 1024 bytes");
         }
 
