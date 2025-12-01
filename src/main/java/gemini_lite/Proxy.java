@@ -2,6 +2,7 @@ package gemini_lite;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 
 import engine.*;
@@ -32,7 +33,7 @@ public class Proxy {
                         System.err.println("Error handling connection: " + e.getMessage());
                         try {
                             var out = clientSocket.getOutputStream();
-                            out.write("43 proxy error".getBytes());
+                            out.write("43 proxy error\r\n".getBytes(StandardCharsets.UTF_8));
                             out.flush();
                         } catch (IOException e2) {
 
