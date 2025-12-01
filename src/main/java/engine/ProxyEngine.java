@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 import protocol.Reply;
 import protocol.Request;
@@ -70,21 +71,27 @@ public class ProxyEngine implements Engine {
                     }
 
                     reply.format(clientOut);
+                    // InputStream body = new ByteArrayInputStream("Hello".getBytes(StandardCharsets.UTF_8));
+                    // Reply reply = new Reply(20, "text/plain", body);
+                    // reply.format(clientOut);
+
                     replySent = true;
 
-                    if (reply.getStatusCode() == 20) {
-                        reply.relayBody(clientOut);
+                    if (reply.getStatusCode() >= 20 && reply.getStatusCode() <= 29) {
+                        in.transferTo(clientOut);
                         clientOut.flush();
                         return;
-                    } else if (reply.isInputReply()) {
-                        communicationBetweenSockets(clientIin, clientOut, in, out);
-                        return;
                     }
+                    // Not required: 1x responses from a server should go straight out to the client; no further interaction needed; no body or anything to handle
+                    // else if (reply.isInputReply()) {
+                    //     communicationBetweenSockets(clientIin, clientOut, in, out);
+                    //     return;
+                    // }
 
-                    if (reply.hasBody()) {
-                        reply.relayBody(clientOut);
-                        clientOut.flush();
-                    }
+                    // if (reply.hasBody()) {
+                    //     reply.relayBody(clientOut);
+                    //     clientOut.flush();
+                    // }
 
                 } catch (Exception e) {
                     if (!replySent) {

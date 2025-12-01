@@ -3,6 +3,8 @@ package protocol;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
+import handler.ReplyAndBody;
+
 /**
  * This class handles a reply, and provides implimentation for
  * parsing a reply and its output
@@ -12,29 +14,16 @@ public class Reply {
     // varaibles holding reference to status code, and meta respectively
     private final int statusCode;
     private final String meta;
-    private final InputStream body;
 
-    /**
-     * Constructor to initialize status code and meta
-     * 
-     * @param statusCode
-     * @param meta
-     */
     public Reply(int statusCode, String meta) {
-        this(statusCode,meta,null);
-    }
-
-    public Reply(int statusCode, String meta, InputStream body) {
         this.statusCode = statusCode;
         this.meta = meta;
-        this.body = body;
     }
 
-    /**
-     * Helpert method to get status code
-     * 
-     * @return status code
-     */
+    public ReplyAndBody withoutBody() {
+        return new ReplyAndBody(this, null);
+    }
+
     public int getStatusCode() {
         return statusCode;
     }
@@ -48,19 +37,6 @@ public class Reply {
         return meta;
     }
 
-    /**
-     * This method parses the reply from inputStream following the Gemini
-     * specification
-     * 
-     * @param in
-     *           the input stream
-     * @return Reply
-     *         the reply object
-     * @throws ProtocolSyntaxException
-     *                                 syntax errors in the reply line
-     * @throws IOException
-     *                                 I/o errors
-     */
     public static Reply parse(InputStream in) throws ProtocolSyntaxException, IOException {
         var buffer = new ByteArrayOutputStream();
         boolean flag = false;
@@ -122,11 +98,6 @@ public class Reply {
     public void format(OutputStream replyOutput) throws IOException {
         String reply = String.format("%02d %s\r\n", statusCode, meta);
         replyOutput.write(reply.getBytes(StandardCharsets.UTF_8));
-
-        if (body != null) {
-            body.transferTo(replyOutput);
-            body.close();
-        }
         replyOutput.flush();
     }
 
@@ -134,15 +105,8 @@ public class Reply {
         return statusCode >= 10 && statusCode < 20;
     }
 
-    public void relayBody(OutputStream out) throws IOException {
-        if (hasBody()) {
-            body.transferTo(out);
-            body.close();
-        }
-    }
-
-    public boolean hasBody() {
-        return body != null;
+    public ReplyAndBody withBody(InputStream body) {
+        return new ReplyAndBody(this, body);
     }
 
 }

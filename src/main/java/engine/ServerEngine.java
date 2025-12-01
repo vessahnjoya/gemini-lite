@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
 
+import handler.ReplyAndBody;
 import handler.ResourceHandler;
 import protocol.*;
 
@@ -58,23 +59,26 @@ public class ServerEngine implements Engine {
 
     public void handleConnection(Socket socket) throws IOException, URISyntaxException {
         Request request = null;
-        Reply reply = null;
+        ReplyAndBody replyAndBody = null;
         try (var i = socket.getInputStream();
                 var o = socket.getOutputStream();) {
             try {
 
                 request = Request.parse(i);
-                reply = resourceHandler.handle(request);
+                replyAndBody = resourceHandler.handle(request);
 
             } catch (ProtocolSyntaxException e) {
-                reply = new Reply(59, "Bad Request", InputStream.nullInputStream());
+                replyAndBody = new Reply(59, "Bad Request").withoutBody();
             } catch ( Exception e){
                 new Reply(50, "Server error").format(o);
                 o.flush();
                 System.err.println("Handle error: " + e.getMessage());
             }
 
-            reply.format(o);
+            replyAndBody.reply().format(o);
+            if (replyAndBody.maybeBody() != null) {
+                replyAndBody.maybeBody().transferTo(o);
+            }
             o.flush();
         } catch (Exception e) {
             socket.close();

@@ -139,15 +139,7 @@ public class ClientEngine implements Engine {
         Reply reply = Reply.parse(in);
 
         if (reply.getStatusCode() == 20) {
-            if (reply.hasBody()) {
-                reply.relayBody(out);
-            } else {
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = in.read(buffer)) != -1) {
-                    System.out.write(buffer, 0, read);
-                }
-            }
+            in.transferTo(System.out);
             System.out.flush();
             System.exit(0);
         } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {

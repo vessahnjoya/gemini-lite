@@ -22,21 +22,21 @@ public class FileSystemRequestHandler implements ResourceHandler {
     }
 
     @Override
-    public Reply handle(Request request) {
+    public ReplyAndBody handle(Request request) {
         try {
             URI uri = request.getUri();
             String pathString = uri.getPath();
 
             if (!"gemini-lite".equals(uri.getScheme())) {
-                return new Reply(59, "Invalid URI, does not contain expected scheme");
+                return new Reply(59, "Invalid URI, does not contain expected scheme").withoutBody();
             }
 
             if (uri.getUserInfo() != null) {
-                return new Reply(59, "User info not allowed");
+                return new Reply(59, "User info not allowed").withoutBody();
             }
 
             if (uri.getFragment()!= null) {
-                return new Reply(59, "", InputStream.nullInputStream());
+                return new Reply(59, "").withoutBody();
             }
 
             Path requestedPath;
@@ -48,26 +48,26 @@ public class FileSystemRequestHandler implements ResourceHandler {
             }
 
             if (!Files.exists(requestedPath) || !Files.isReadable(requestedPath)) {
-                return new Reply(51, "Not Found", InputStream.nullInputStream());
+                return new Reply(51, "Not Found").withoutBody();
             }
 
             if (Files.isDirectory(requestedPath)) {
                 String mime = "text/gemini";
                 InputStream body = listDirectoryElements(requestedPath);
                 
-                return new Reply(20, mime, body);
+                return new Reply(20, mime).withBody(body);
             }
 
             if (Files.isRegularFile(requestedPath) && Files.isReadable(requestedPath)) {
                 String mime = getMimeType(requestedPath);
                 InputStream body = Files.newInputStream(requestedPath);
-                return new Reply(20, mime, body);
+                return new Reply(20, mime).withBody(body);
             }
 
-            return new Reply(51, "Not Found", InputStream.nullInputStream());
+            return new Reply(51, "Not Found").withoutBody();
 
         } catch (Exception e) {
-            return new Reply(50, "Server crashed");
+            return new Reply(50, "Server crashed").withoutBody();
         }
     }
 

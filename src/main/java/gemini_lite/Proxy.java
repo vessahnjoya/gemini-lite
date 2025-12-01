@@ -33,7 +33,7 @@ public class Proxy {
                     } finally {
                         try {
                             clientSocket.close();
-                            serverSocket.close();
+                            // Do not close: you want to accept another connection later! -- serverSocket.close();
                         } catch (Exception e) {
                         }
                     }

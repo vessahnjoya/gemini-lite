@@ -11,7 +11,7 @@ public interface ResourceHandler {
         return new FileSystemRequestHandler(path);
     }
 
-    Reply handle(Request request);
+    ReplyAndBody handle(Request request);
 
     InputStream getData(Request request) throws IOException;
 }

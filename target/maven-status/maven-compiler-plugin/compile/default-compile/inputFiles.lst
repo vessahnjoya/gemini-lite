@@ -6,6 +6,7 @@
 /Users/njoya/Desktop/Year2/P2/computer-networks/bcs1120-geminiproject/src/main/java/gemini_lite/Proxy.java
 /Users/njoya/Desktop/Year2/P2/computer-networks/bcs1120-geminiproject/src/main/java/gemini_lite/Server.java
 /Users/njoya/Desktop/Year2/P2/computer-networks/bcs1120-geminiproject/src/main/java/handler/FileSystemRequestHandler.java
+/Users/njoya/Desktop/Year2/P2/computer-networks/bcs1120-geminiproject/src/main/java/handler/ReplyAndBody.java
 /Users/njoya/Desktop/Year2/P2/computer-networks/bcs1120-geminiproject/src/main/java/handler/ResourceHandler.java
 /Users/njoya/Desktop/Year2/P2/computer-networks/bcs1120-geminiproject/src/main/java/protocol/ProtocolSyntaxException.java
 /Users/njoya/Desktop/Year2/P2/computer-networks/bcs1120-geminiproject/src/main/java/protocol/Reply.java
