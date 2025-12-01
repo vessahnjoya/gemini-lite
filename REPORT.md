@@ -30,9 +30,6 @@ Student ID number: i6371413
 
 (If you attempt any bonus enhancements, document them in this section.)
 
-## Test Cases
-
-(Include at least 3 of each kind of test case here, formatted as instructed in the project manual.)
 
 ### Client test cases
 
