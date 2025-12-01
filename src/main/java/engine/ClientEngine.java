@@ -113,22 +113,11 @@ public class ClientEngine implements Engine {
         } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
             handleRedirect(current, count, reply.getMeta().trim());
         } else if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
-            String encodedInput;
             if (userInput != null) {
-                try {
-                    encodedInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8.toString()).replace("+",
-                            "%20");
-                    
-                            System.err.println( "encoded input" + encodedInput);
-
-                } catch (Exception e) {
-                    System.err.println("Invalid query");
-                    System.exit(1);
-                    return;
-                }
+                
                 URI newUri;
                 try {
-                    newUri = utils.URIutils.buildNewURI(current, encodedInput);
+                    newUri = utils.URIutils.buildNewURI(current, userInput);
                     System.err.println("New uri: " + newUri);
                 } catch (Exception e) {
                     System.err.println("invalid query");
