@@ -118,21 +118,24 @@ public class ClientEngine implements Engine {
                 try {
                     encodedInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8.toString()).replace("+",
                             "%20");
+                    
+                            System.err.println( "encoded input" + encodedInput);
 
                 } catch (Exception e) {
                     System.err.println("Invalid query");
                     System.exit(1);
                     return;
                 }
-                URI newuri;
+                URI newUri;
                 try {
-                    newuri = utils.URIutils.buildNewURI(current, encodedInput);
+                    newUri = utils.URIutils.buildNewURI(current, encodedInput);
+                    System.err.println("New uri: " + newUri);
                 } catch (Exception e) {
                     System.err.println("invalid query");
                     System.exit(1);
                     return;
                 }
-                runWithRedirect(newuri, count + 1);
+                runWithRedirect(newUri, count + 1);
                 return;
             }
         } else if (reply.getStatusCode() == 44) {
