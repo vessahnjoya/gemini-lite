@@ -3,8 +3,6 @@ package engine;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-
-import handler.ReplyAndBody;
 import protocol.*;
 
 public class ClientEngine implements Engine {
@@ -110,7 +108,6 @@ public class ClientEngine implements Engine {
         request.format(out);
 
         Reply reply = Reply.parse(in);
-        ReplyAndBody replyAndBody = reply.withoutBody();
         if (reply.getStatusCode() == 20) {
             in.transferTo(System.out);
             System.out.flush();
@@ -118,10 +115,17 @@ public class ClientEngine implements Engine {
         } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
             handleRedirect(current, count, reply.getMeta().trim());
         } else if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
-
+            String encodedInput;
             if (userInput != null) {
-                String encodedInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8.toString()).replace("+",
-                        "%20");
+                try {
+                    encodedInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8.toString()).replace("+",
+                            "%20");
+
+                } catch (Exception e) {
+                    System.err.println("Invalid query");
+                    System.exit(1);
+                    return;
+                }
                 URI newuri;
                 try {
                     newuri = utils.URIutils.buildNewURI(current, encodedInput);
