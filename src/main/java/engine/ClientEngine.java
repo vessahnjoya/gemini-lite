@@ -52,8 +52,6 @@ public class ClientEngine implements Engine {
             var host = getHost(uri);
             var port = getPort(uri);
             socket = new Socket(host, port);
-            // var in = socket.getInputStream();
-            // var out = socket.getOutputStream();
         }
 
         runWithRedirect(uri, 0);
