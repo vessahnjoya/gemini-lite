@@ -33,6 +33,7 @@ public class Proxy {
                     } finally {
                         try {
                             clientSocket.close();
+                            serverSocket.close();
                         } catch (Exception e) {
                         }
                     }
