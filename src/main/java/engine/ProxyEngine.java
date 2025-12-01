@@ -69,6 +69,9 @@ public class ProxyEngine implements Engine {
                         return;
                     }
 
+                    reply.format(clientOut);
+                    replySent = true;
+
                     if (reply.getStatusCode() > 59) {
                         sendProxyError(out, "Invalid reply status code");
                     }
@@ -77,9 +80,6 @@ public class ProxyEngine implements Engine {
                         clientOut.flush();
                         return;
                     }
-
-                    reply.format(clientOut);
-                    replySent = true;
 
                 } catch (Exception e) {
                     if (!replySent) {
