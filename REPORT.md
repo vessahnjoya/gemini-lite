@@ -227,7 +227,7 @@ destination: ff:ff:ff:ff:ff:ff`
 
 1- Compare and contrast Gemini Lite’s response codes with HTTP/1.1’s response codes. Why do you think the designer of Gemini chose to depart from the classification scheme used by HTTP?
 
-``
+`Gemini lite uses two digits status code as compared to HTTP/1.1 which uses three digits status codes. Gemini lite have no header`
 
 1- Suggest some reasons why implementing a caching proxy is challenging (or even impossible!) given the Gemini Lite specification as it stands. Caching differs from archival (see “bonus enhancements” section for the Proxy program): archival only sends its local copy of a resource if the upstream server is unavailable, while caching uses the local copy (if it is “fresh” enough) even if the upstream server is available.
 
