@@ -227,30 +227,38 @@ destination: ff:ff:ff:ff:ff:ff`
 
 1- Compare and contrast Gemini Lite’s response codes with HTTP/1.1’s response codes. Why do you think the designer of Gemini chose to depart from the classification scheme used by HTTP?
 
-`Gemini lite uses two digits status code as compared to HTTP/1.1 which uses three digits status codes. Gemini lite have no header`
+`Gemini lite uses two digits status code as compared to HTTP/1.1 which uses three digits status codes. Gemini lite have no header, responses consists of "status code + meta + body" unlike HTTP that uses header for a better design.
+Having such response format makes it easy to implement the protocol`
 
-1- Suggest some reasons why implementing a caching proxy is challenging (or even impossible!) given the Gemini Lite specification as it stands. Caching differs from archival (see “bonus enhancements” section for the Proxy program): archival only sends its local copy of a resource if the upstream server is unavailable, while caching uses the local copy (if it is “fresh” enough) even if the upstream server is available.
+2- Suggest some reasons why implementing a caching proxy is challenging (or even impossible!) given the Gemini Lite specification as it stands. Caching differs from archival (see “bonus enhancements” section for the Proxy program): archival only sends its local copy of a resource if the upstream server is unavailable, while caching uses the local copy (if it is “fresh” enough) even if the upstream server is available.
 
-``
+`Straight forward I cannot think of a function or a way of efficiently loading a local copy while validating it against its upstream. Maybe looking at how google handles such. Hence i can say, implimenting and optimizing a validation function can be hard but doable, depends on the loading tiome constraints, say 5 seconds and you also have to display a file (due to an enhancement of the protocol), if the file was .gmi in cache and deleted from upstream, replaced by a .gif file, loading might exceed 5 seconds`
 
 3- Is it acceptable, within the specification, for a proxy to simply relay redirections and “slow down” responses that it receives from upstream? Why or why not? Which position should the specification take on this question, in your opinion, and why?
 
-``
+`From the protocol specifications, it is allowed by the protocol to relay redirects between client and server using a proxy`
+
+`The protocol should maintain relaying and recommend but not require slow down reponsses to enhance sability and efficiency while respeting current protocol specifications`
 
 4- Imagine you are building a graphical browser for Gemtext, with clickable hyperlinks and so on. Imagine you are asked to change the overall system—this could mean any combination of changes to your client program, to gemini-lite servers, or to the gemini-lite or Gemtext protocol specifications themselves—to implement support for inline display of images in a page.
 
 - Do you need to make changes to the gemini-lite network protocol? If so, which?
 
-``
+     ``
 
-Do you need to make changes to the Gemtext format? If so, which?
+- Do you need to make changes to the Gemtext format? If so, which?
 
-``
+    `Maybe redefining the display of a directory, adding external links`
 
-Do you need to change the specification for how clients are required to behave? If so, how? Perhaps there’s an alternative interaction style that allows inline display of images while sticking to the letter of the spec?
+- Do you need to change the specification for how clients are required to behave? If so, how? Perhaps there’s an alternative interaction style that allows inline display of images while sticking to the letter of the spec?
 
-``
+    `clients can have other mime types reader such as a .gif reader to display it or using an external viewer in the context of a GUI client. This respects the protocol because the dislay of that .gif file is just an additional request to the server hence respecting the rules of the protocol`
 
 5- Criticise the protocol more generally, in light of the needs of application programs as discussed in class. Does it offer reliable delivery? Does it make efficient use of available bandwidth? Is it precisely-enough specified? How could it be improved?
 
+`I think the gemini protocol is reliable because is uses tcp to communicate between server and client hence inherits all tcp's characteristics.
+In terms of bandwidth, the gemini protocol is less efficient, as there is no caching hence for every request the same data is fetched from the server insead of a cache therefore overloading of server.`
+
+`With a basic knowledge of networks and protocols, understanding the specificatrions are easy. conventions are used to clearly define what should be done, potential improvemements. Only downside can be code strcuture (how to handle redirects, error replies while respecting SOLID principles) which was hard for me where i did not know if i should have a separate error class and depending on each engine, call that class an assign the respective error reply etc.
+`
 ``
