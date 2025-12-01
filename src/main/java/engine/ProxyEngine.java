@@ -69,33 +69,32 @@ public class ProxyEngine implements Engine {
                         return;
                     }
 
-                    reply.format(clientOut);
-                    // InputStream body = new
-                    // ByteArrayInputStream("Hello".getBytes(StandardCharsets.UTF_8));
-                    // Reply reply = new Reply(20, "text/plain", body);
-                    // reply.format(clientOut);
-
-                    replySent = true;
-
+                    if (reply.getStatusCode() > 59) {
+                        sendProxyError(out, "Invalid reply status code");
+                    }
                     if (reply.getStatusCode() >= 20 && reply.getStatusCode() <= 29) {
                         in.transferTo(clientOut);
                         clientOut.flush();
                         return;
                     }
 
+                    reply.format(clientOut);
+                    replySent = true;
+
                 } catch (Exception e) {
                     if (!replySent) {
-                        sendProxyError(clientOut, "proxy error: cannot connect to client");
+                        sendProxyError(clientOut, "Proxy error: " + e.getMessage());
                         clientOut.flush();
                     }
-                }
-            }
 
+                }
+
+            }
+            clientSocket.close();
         }
-        clientSocket.close();
     }
 
-    private void sendProxyError(BufferedOutputStream out, String meta) throws IOException {
+    public void sendProxyError(BufferedOutputStream out, String meta) throws IOException {
         try {
             new Reply(PROXY_ERROR_CODE, meta).format(out);
         } catch (Exception e) {

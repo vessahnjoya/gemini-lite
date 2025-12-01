@@ -27,7 +27,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
             URI uri = request.getUri();
             String pathString = uri.getPath();
 
-            if (!"gemini-lite".equals(uri.getScheme())) {
+            if (!"gemini-lite".equalsIgnoreCase(uri.getScheme())) {
                 return new Reply(59, "Invalid URI, does not contain expected scheme").withoutBody();
             }
 

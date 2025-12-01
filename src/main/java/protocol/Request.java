@@ -48,7 +48,7 @@ public class Request {
             buffer.write(reader);
         }
         String line = buffer.toString(StandardCharsets.UTF_8.name());
-        if (line.isEmpty() || !line.startsWith(URI_SCHEME)) {
+        if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME)) {
             throw new ProtocolSyntaxException("Invalid or empty URI");
         }
         return new Request(new URI(line));

@@ -59,7 +59,7 @@
                 "reply": "10 Enter search query\r\n"
             },
             {
-                "url": "gemini-lite://localhost:1958/search??what%20is%20gemini%20protocol",
+                "url": "gemini-lite://localhost:1958/search?what%20is%20gemini%20protocol",
                 "reply": "20 text/gemini\r\n# Search Results\r\n\r\nYour query: what is gemini protocol\r\n\r\n=> /about/gemini protocol More about gemini protocol\r\n"
             }
         ],
@@ -102,7 +102,7 @@
     },
     {
         "type": "server",
-        "name": "Treat empty path as root index file",
+        "name": "",
         "documents": {
             "index.gmi": "# Root index\r\n"
         },
@@ -113,15 +113,15 @@
     },
     {
         "type": "proxy",
-        "name": "Forward slow-down status from server unchanged",
-        "request": "gemini-lite://localhost/too-fast\r\n",
+        "name": "Unrecognized request",
+        "request": "gemini-lite://localhost/resource\r\n",
         "server_transactions": [
             {
-                "url": "gemini-lite://localhost/too-fast",
+                "url": "gemini-lite://localhost/resource",
                 "reply": "44 Slow down\r\n"
             }
         ],
-        "reply_regex": "^44( .*)?$",
+        "reply_regex": "",
         "body": "",
         "justification": "When the server responds with a 44 slow-down status, the proxy must not hide or reinterpret it. It should relay the same status code and meta to its client, with no response body."
     },

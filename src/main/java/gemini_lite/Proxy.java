@@ -26,8 +26,7 @@ public class Proxy {
 
                 executor.execute(() -> {
                     try {
-                        engine = new ProxyEngine(clientSocket);
-                        engine.run();
+                        new ProxyEngine(clientSocket).run();;
                     } catch (Exception e) {
                         System.err.println("Error handling connection: " + e.getMessage());
                         // TODO:
