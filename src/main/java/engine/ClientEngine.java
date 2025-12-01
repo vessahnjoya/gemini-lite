@@ -2,7 +2,6 @@ package engine;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import protocol.*;
 
 public class ClientEngine implements Engine {

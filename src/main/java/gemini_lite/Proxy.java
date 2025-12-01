@@ -26,14 +26,20 @@ public class Proxy {
 
                 executor.execute(() -> {
                     try {
-                        new ProxyEngine(clientSocket).run();;
+                        engine = new ProxyEngine(clientSocket);
+                        engine.run();
                     } catch (Exception e) {
                         System.err.println("Error handling connection: " + e.getMessage());
-                        // TODO:
+                        try {
+                            var out = clientSocket.getOutputStream();
+                            out.write("43 proxy error".getBytes());
+                            out.flush();
+                        } catch (IOException e2) {
+
+                        }
                     } finally {
                         try {
                             clientSocket.close();
-                            // Do not close: you want to accept another connection later! -- serverSocket.close();
                         } catch (Exception e) {
                         }
                     }
