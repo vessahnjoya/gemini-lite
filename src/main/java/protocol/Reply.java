@@ -90,14 +90,14 @@ public class Reply {
             }
         }
 
-        byte[] metaBytes = meta.getBytes(StandardCharsets.UTF_8);
-
-        for (byte b : metaBytes) {
-            int ub = b & 0xFF;
-            if (ub >= 0x80 && ub <= 0x9F) {
+        for (int i = 0; i < meta.length(); i++) {
+            char character = meta.charAt(i);
+            if (character >= 0x80 && character <= 0x9F) {
                 throw new ProtocolSyntaxException("Meta contains C1 control");
             }
         }
+
+        byte[] metaBytes = meta.getBytes(StandardCharsets.UTF_8);
 
         if (metaBytes.length > 1024) {
             throw new ProtocolSyntaxException("Meta exceeds 1024 bytes");

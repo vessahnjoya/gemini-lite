@@ -69,7 +69,7 @@
     },
     {
         "type": "server",
-        "name": "Reject overlong request URI (> 1024 bytes)",
+        "name": "Reject overlong request URI > 1024 bytes",
         "documents": {
             "index.gmi": "# Hello\r\n"
         },
