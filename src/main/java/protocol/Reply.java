@@ -49,8 +49,7 @@ public class Reply {
                     flag = false;
                     break;
                 }
-                buffer.write(reader);
-                flag = false;
+                throw new ProtocolSyntaxException("End of stream missing line terminator");
             }
 
             if (reader == '\r') {
@@ -59,7 +58,7 @@ public class Reply {
             }
 
             if (reader == '\n') {
-                break;
+                throw new ProtocolSyntaxException("End of stream missing line terminator");
             }
 
             buffer.write(reader);
