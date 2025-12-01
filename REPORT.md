@@ -216,9 +216,13 @@ destination: ff:ff:ff:ff:ff:ff`
 #### Lab 5: Port Scan
 
 6.11-
+
 ![sudo nmap -T5 pi0038.kale](report-images/step6.11.png)
+
 6.22-
+
 ![sudo nmap -A -T5 pi0038.kale](report-images/step6.12.png)
+
 
 ## Reflection on Gemini Lite
 
