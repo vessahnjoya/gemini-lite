@@ -1,7 +1,6 @@
 package engine;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.*;
 
 import handler.ReplyAndBody;
@@ -9,27 +8,16 @@ import handler.ResourceHandler;
 import protocol.*;
 
 public class ServerEngine implements Engine {
-    // Variable holding reference to the port number, and resource handler
     private final int port;
     private final ResourceHandler resourceHandler;
     private final int DEFAULT_PORT = 1958;
 
-    /**
-     * Constructor to initialize URI
-     * 
-     * @param uri
-     */
     public ServerEngine(int port, ResourceHandler resourceHandler) {
         this.port = port;
         this.resourceHandler = resourceHandler;
 
     }
 
-    /**
-     * Helper method to get port. If not stated, returns tHe default port 1958
-     * 
-     * @return port number
-     */
     private int getPort() {
         if (port == -1) {
             return DEFAULT_PORT;
@@ -69,7 +57,7 @@ public class ServerEngine implements Engine {
 
             } catch (ProtocolSyntaxException e) {
                 replyAndBody = new Reply(59, "Bad Request").withoutBody();
-            } catch ( Exception e){
+            } catch (Exception e) {
                 new Reply(50, "Server error").format(o);
                 o.flush();
                 System.err.println("Handle error: " + e.getMessage());

@@ -6,23 +6,13 @@ import java.nio.charset.StandardCharsets;
 
 import protocol.*;
 
-/**
- * Thic class implements the Engine interface, and contains the running logic of
- * the client.
- */
 public class ClientEngine implements Engine {
-    // Variable holding reference to the URI and constants respecrively
     private final URI uri;
     private final int MAX_REDIRECTS = 5;
     private final int DEFAULT_PORT = 1958;
     private Socket socket;
     private String userInput;
 
-    /**
-     * Constructor to initialize URI
-     * 
-     * @param uri
-     */
     public ClientEngine(URI uri) {
         this.uri = uri;
     }
@@ -35,25 +25,12 @@ public class ClientEngine implements Engine {
     public ClientEngine(Socket socket, URI uri) throws IOException {
         this.socket = socket;
         this.uri = uri;
-        // in = socket.getInputStream();
-        // out = socket.getOutputStream();
     }
 
-    /**
-     * Helpher method to check whether or not the URI contains userinfo, to complY
-     * with gemini specification
-     *
-     * @return a boolean
-     */
     private boolean hasUserInfo() {
         return uri.getUserInfo() != null;
     }
 
-    /**
-     * Helper method to get port. If not stated, returns tHe default port 1958
-     * 
-     * @return port number
-     */
     private int getPort(URI current) {
         if (current.getPort() == -1) {
             return DEFAULT_PORT;
@@ -61,11 +38,6 @@ public class ClientEngine implements Engine {
         return current.getPort();
     }
 
-    /**
-     * Helpher mehod to get host name
-     * 
-     * @return host name
-     */
     private String getHost(URI current) {
         return current.getHost();
     }

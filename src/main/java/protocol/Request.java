@@ -5,48 +5,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
-/**
- * This class implimnets the factory interface and provides implimentation for
- * parsing a request and its output
- * format.
- */
 public class Request {
-    // variable holding reference to the uri
     private final URI uri;
-
-    // constants to account for uri length and the expected scheme for the uri
-    // respectively
     private static final int MAX_URI_BYTE_SIZE = 1024;
     private static final String URI_SCHEME = "gemini-lite://";
 
-    /**
-     * Comstructor to initialiZe the URI
-     * 
-     * @param uri
-     */
     public Request(URI uri) {
         this.uri = uri;
     }
 
-    /**
-     * Helper method to get the uri
-     * 
-     * @return URI
-     */
     public URI getUri() {
         return uri;
     }
 
-    /**
-     * This method parses the request from inputStream following the Gemini
-     * specification, and reading byte-byte as recommended
-     * 
-     * @param in
-     * @return request
-     * @throws ProtocolSyntaxException Syntax errors in the request line
-     * @throws IOException             I/O errors realted to the reader
-     * @throws URISyntaxException 
-     */
     public static Request parse(InputStream in) throws ProtocolSyntaxException, IOException, URISyntaxException {
         var buffer = new ByteArrayOutputStream();
         int count = 0;
@@ -83,12 +54,6 @@ public class Request {
         return new Request(new URI(line));
     }
 
-    /**
-     * This method formats the request into the outputstream
-     * 
-     * @param requestOutput
-     * @throws IOException
-     */
     public void format(OutputStream requestOutput) throws IOException {
         String request = uri.toString() + "\r\n";
         requestOutput.write(request.getBytes(StandardCharsets.UTF_8));
