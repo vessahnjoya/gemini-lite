@@ -97,6 +97,12 @@ public class Reply {
             }
         }
 
+        if (statusCode == 20) {
+            if (meta == null || meta.isEmpty() || !meta.contains("/") ) {
+                throw new ProtocolSyntaxException("Missing MIME type");
+            }
+        }
+
         byte[] metaBytes = meta.getBytes(StandardCharsets.UTF_8);
 
         if (metaBytes.length > 1024) {
