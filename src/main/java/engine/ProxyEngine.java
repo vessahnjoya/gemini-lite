@@ -69,7 +69,7 @@ public class ProxyEngine implements Engine {
                         return;
                     }
 
-                    reply.format(System.out);
+                    reply.format(clientOut);
                     replySent = true;
 
                     if (reply.getStatusCode() == 20) {
