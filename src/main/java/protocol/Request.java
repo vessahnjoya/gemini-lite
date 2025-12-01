@@ -55,7 +55,22 @@ public class Request {
     }
 
     public void format(OutputStream requestOutput) throws IOException {
-        String request = uri.toString() + "\r\n";
+        StringBuilder builder = new StringBuilder();
+        builder.append(uri.getScheme()).append("://").append(uri.getHost());
+        
+        if (uri.getPort() != -1) {
+            builder.append(":").append(uri.getPort());
+        }
+
+        if (uri.getPath() != null) {
+            builder.append(uri.getPath());
+        }
+
+        if (uri.getRawQuery() != null) {
+            builder.append("?").append(uri.getRawQuery());
+        }
+
+        String request = builder.toString() + "\r\n";
         requestOutput.write(request.getBytes(StandardCharsets.UTF_8));
         requestOutput.flush();
     }
