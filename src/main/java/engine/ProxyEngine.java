@@ -95,6 +95,7 @@ public class ProxyEngine implements Engine {
             }
 
         }
+        clientSocket.close();
     }
 
     private void sendProxyError(BufferedOutputStream out, String meta) throws IOException {
