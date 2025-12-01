@@ -138,9 +138,8 @@ public class ClientEngine implements Engine {
                 in.transferTo(System.out);
             }
 
-        } else {
+        }
             System.out.flush();
             System.exit(0);
-        }
     }
 }
