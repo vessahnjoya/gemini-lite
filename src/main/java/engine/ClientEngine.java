@@ -117,7 +117,7 @@ public class ClientEngine implements Engine {
             if (userInput != null) {
                 try {
                     encodedInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8.toString()).replace("+",
-                            "%20");
+                            "%20").replace("%", "%25");
 
                 } catch (Exception e) {
                     System.err.println("Invalid query");
