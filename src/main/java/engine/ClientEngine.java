@@ -135,6 +135,7 @@ public class ClientEngine implements Engine {
                     return;
                 }
                 runWithRedirect(newuri, count + 1);
+                return;
             }
         } else if (reply.getStatusCode() == 44) {
             try {
