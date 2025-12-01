@@ -90,7 +90,16 @@ public class Reply {
             }
         }
 
-        if (meta.getBytes(StandardCharsets.UTF_8).length > 1024) {
+        byte[] metaBytes = meta.getBytes(StandardCharsets.UTF_8);
+
+        for (byte b : metaBytes) {
+            int ub = b & 0xFF;
+            if (ub >= 0x80 && ub <= 0x9F) {
+                throw new ProtocolSyntaxException("Meta contains C1 control");
+            }
+        }
+
+        if (metaBytes.length > 1024) {
             throw new ProtocolSyntaxException("Meta exceeds 1024 bytes");
         }
 
