@@ -132,6 +132,9 @@ public class ClientEngine implements Engine {
                 }
                 runWithRedirect(newuri, count + 1);
             }
+        } else if (reply.getStatusCode() >=40 && reply.getStatusCode() <= 59) {
+            System.out.flush();
+        System.exit(reply.getStatusCode());
         }
         System.out.flush();
         System.exit(1);
