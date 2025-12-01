@@ -30,6 +30,7 @@ public class Proxy {
                         engine.run();
                     } catch (Exception e) {
                         System.err.println("Error handling connection: " + e.getMessage());
+                        // TODO:
                     } finally {
                         try {
                             clientSocket.close();
