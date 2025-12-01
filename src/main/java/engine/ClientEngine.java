@@ -132,9 +132,21 @@ public class ClientEngine implements Engine {
                 }
                 runWithRedirect(newuri, count + 1);
             }
-        } else if (reply.getStatusCode() >=40 && reply.getStatusCode() <= 59) {
+        } else if (reply.getStatusCode() == 44) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+
+            runWithRedirect(current, count + 1);
+            return;
+
+        } else if (reply.getStatusCode() >= 50 && reply.getStatusCode() < 60) {
             System.out.flush();
-        System.exit(reply.getStatusCode());
+            System.exit(reply.getStatusCode());
+        } else if (reply.getStatusCode() >= 40 && reply.getStatusCode() < 50) {
+            System.out.flush();
+            System.exit(1);
         }
         System.out.flush();
         System.exit(1);
