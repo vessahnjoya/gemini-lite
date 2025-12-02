@@ -14,6 +14,7 @@ public class ProxyEngine implements Engine {
     private final Socket clientSocket;
     private final int DEFAULT_PORT = 1958;
     private final int PROXY_ERROR_CODE = 43;
+    private final int CLIENT_ERROR_CODE = 59;
     private static final String URI_SCHEME = "gemini-lite://";
 
     public ProxyEngine(Socket socket) {
@@ -28,8 +29,7 @@ public class ProxyEngine implements Engine {
             try {
                 request = Request.parse(clientIin);
             } catch (Exception e) {
-                var reply = new Reply(59, "Invalid request");
-                reply.format(clientOut);
+                sendErrorOnBadRequest(clientOut, "Invalid request");
                 clientOut.flush();
                 return;
             }
@@ -168,7 +168,7 @@ public class ProxyEngine implements Engine {
         }
     }
 
-    public void sendProxyError(BufferedOutputStream out, String meta) throws IOException {
+    private void sendProxyError(BufferedOutputStream out, String meta) throws IOException {
         try {
             new Reply(PROXY_ERROR_CODE, meta).format(out);
         } catch (Exception e) {
@@ -176,5 +176,15 @@ public class ProxyEngine implements Engine {
             System.exit(1);
         }
     }
+
+    private void sendErrorOnBadRequest(BufferedOutputStream out, String meta) throws IOException{
+        try {
+            new Reply(CLIENT_ERROR_CODE, meta).format(out);
+        } catch (Exception e) {
+            System.err.println("Failed to send client Error");
+            System.exit(1);
+        }
+    }
+
 
 }
