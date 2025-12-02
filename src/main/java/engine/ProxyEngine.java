@@ -114,7 +114,8 @@ public class ProxyEngine implements Engine {
                         replySent = true;
                         clientOut.flush();
                         return;
-                    } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+                    }
+                    while (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
                         URI redirectUri;
                         if (reply.getMeta().startsWith(URI_SCHEME)) {
                             redirectUri = new URI(reply.getMeta());
@@ -132,15 +133,7 @@ public class ProxyEngine implements Engine {
                                 redirectRequest.format(rout);
 
                                 var redirectReply = Reply.parse(rin);
-
                                 redirectReply.format(clientOut);
-                                replySent = true;
-
-                                if (redirectReply.getStatusCode() >= 20 && redirectReply.getStatusCode() < 30) {
-                                    rin.transferTo(clientOut);
-                                }
-                                clientOut.flush();
-                                return;
                             }
 
                         }
@@ -151,9 +144,9 @@ public class ProxyEngine implements Engine {
 
                     if (reply.getStatusCode() >= 20 && reply.getStatusCode() <= 29) {
                         in.transferTo(clientOut);
-                        clientOut.flush();
-                        return;
                     }
+                    
+                    clientOut.flush();
 
                 } catch (Exception e) {
                     if (!replySent) {
@@ -177,7 +170,7 @@ public class ProxyEngine implements Engine {
         }
     }
 
-    private void sendErrorOnBadRequest(BufferedOutputStream out, String meta) throws IOException{
+    private void sendErrorOnBadRequest(BufferedOutputStream out, String meta) throws IOException {
         try {
             new Reply(CLIENT_ERROR_CODE, meta).format(out);
         } catch (Exception e) {
@@ -185,6 +178,5 @@ public class ProxyEngine implements Engine {
             System.exit(1);
         }
     }
-
 
 }
