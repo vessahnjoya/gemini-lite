@@ -28,7 +28,8 @@ public class ProxyEngine implements Engine {
             try {
                 request = Request.parse(clientIin);
             } catch (Exception e) {
-                sendProxyError(clientOut, "Proxy error: invalid request");
+                var reply = new Reply(59, "Invalid request");
+                reply.format(clientOut);
                 clientOut.flush();
                 return;
             }
