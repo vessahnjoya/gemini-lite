@@ -15,6 +15,7 @@ public class ProxyEngine implements Engine {
     private final int DEFAULT_PORT = 1958;
     private final int PROXY_ERROR_CODE = 43;
     private final int CLIENT_ERROR_CODE = 59;
+    private final int MAX_REDIRECTS = 5;
     private static final String URI_SCHEME = "gemini-lite://";
 
     public ProxyEngine(Socket socket) {
@@ -115,32 +116,38 @@ public class ProxyEngine implements Engine {
                         clientOut.flush();
                         return;
                     } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
-                        URI redirectUri;
-                        if (reply.getMeta().startsWith(URI_SCHEME)) {
-                            redirectUri = new URI(reply.getMeta());
-                        } else {
-                            redirectUri = request.getUri().resolve(reply.getMeta());
-                        }
+                        int count = 0;
 
-                        try (var redirectSocket = new Socket()) {
-                            redirectSocket.connect(new InetSocketAddress(redirectUri.getHost(), DEFAULT_PORT));
+                        while (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40 && count < MAX_REDIRECTS) {
+                            count++;
+                            URI redirectUri;
+                            if (reply.getMeta().startsWith(URI_SCHEME)) {
+                                redirectUri = new URI(reply.getMeta());
+                            } else {
+                                redirectUri = request.getUri().resolve(reply.getMeta());
+                            }
 
-                            try (var rin = new BufferedInputStream(redirectSocket.getInputStream());
-                                    var rout = new BufferedOutputStream(redirectSocket.getOutputStream())) {
+                            try (var redirectSocket = new Socket()) {
+                                redirectSocket.connect(new InetSocketAddress(redirectUri.getHost(), DEFAULT_PORT));
 
-                                var redirectRequest = new Request(redirectUri);
-                                redirectRequest.format(rout);
+                                try (var rin = new BufferedInputStream(redirectSocket.getInputStream());
+                                        var rout = new BufferedOutputStream(redirectSocket.getOutputStream())) {
 
-                                var redirectReply = Reply.parse(rin);
+                                    var redirectRequest = new Request(redirectUri);
+                                    redirectRequest.format(rout);
 
-                                redirectReply.format(clientOut);
-                                replySent = true;
+                                    var redirectReply = Reply.parse(rin);
 
-                                if (redirectReply.getStatusCode() >= 20 && redirectReply.getStatusCode() < 30) {
-                                    rin.transferTo(clientOut);
+                                    redirectReply.format(clientOut);
+                                    replySent = true;
+
+                                    if (redirectReply.getStatusCode() >= 20 && redirectReply.getStatusCode() < 30) {
+                                        rin.transferTo(clientOut);
+                                    }
+                                    clientOut.flush();
+                                    return;
                                 }
-                                clientOut.flush();
-                                return;
+
                             }
 
                         }
@@ -177,7 +184,7 @@ public class ProxyEngine implements Engine {
         }
     }
 
-    private void sendErrorOnBadRequest(BufferedOutputStream out, String meta) throws IOException{
+    private void sendErrorOnBadRequest(BufferedOutputStream out, String meta) throws IOException {
         try {
             new Reply(CLIENT_ERROR_CODE, meta).format(out);
         } catch (Exception e) {
@@ -185,6 +192,5 @@ public class ProxyEngine implements Engine {
             System.exit(1);
         }
     }
-
 
 }
