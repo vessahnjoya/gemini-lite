@@ -3,6 +3,7 @@ package engine;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URI;
 import java.net.UnknownHostException;
 
 import protocol.Reply;
@@ -13,6 +14,8 @@ public class ProxyEngine implements Engine {
     private final Socket clientSocket;
     private final int DEFAULT_PORT = 1958;
     private final int PROXY_ERROR_CODE = 43;
+    private static final String URI_SCHEME = "gemini-lite://";
+
 
     public ProxyEngine(Socket socket) {
         this.clientSocket = socket;
@@ -69,12 +72,45 @@ public class ProxyEngine implements Engine {
                         return;
                     }
 
+                    if (reply.getStatusCode() < 10 || reply.getStatusCode() > 59) {
+                        sendProxyError(clientOut, "Invalid reply status code");
+                    }
+
+                    if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+                        URI redirectUri;
+                        if (reply.getMeta().startsWith(URI_SCHEME)) {
+                             redirectUri = new URI(reply.getMeta());
+                        }else{
+                            redirectUri = request.getUri().resolve(reply.getMeta());
+                        }
+                        
+                        try (var redirectSocket = new Socket()) {
+                            redirectSocket.connect(new InetSocketAddress(redirectUri.getHost(), redirectUri.getPort()));
+
+                            try (var rin = new BufferedInputStream(redirectSocket.getInputStream());
+                                    var rout = new BufferedOutputStream(redirectSocket.getOutputStream())) {
+                                        
+                                        var redirectRequest = new Request(redirectUri);
+                                        redirectRequest.format(rout);
+
+                                        var redirectReply = Reply.parse(rin);
+
+                                        redirectReply.format(clientOut);
+                                        replySent = true;
+
+                                        if (redirectReply.getStatusCode()>= 20 && reply.getStatusCode() < 30) {
+                                            rin.transferTo(clientOut);
+                                        }
+                                        clientOut.flush();
+                                        return;
+                            }
+                            
+                        }
+                        
+                    }
                     reply.format(clientOut);
                     replySent = true;
 
-                    if (reply.getStatusCode() > 59) {
-                        sendProxyError(out, "Invalid reply status code");
-                    }
                     if (reply.getStatusCode() >= 20 && reply.getStatusCode() <= 29) {
                         in.transferTo(clientOut);
                         clientOut.flush();
