@@ -74,11 +74,9 @@ public class ProxyEngine implements Engine {
                     if (reply.getStatusCode() == 44) {
                         int seconds;
                         try {
-                            seconds = Integer.parseInt(reply.getMeta());
+                            seconds = Integer.parseInt(reply.getMeta().trim());
                         } catch (NumberFormatException e) {
-                            sendProxyError(clientOut, "Proxy error: invalid slow-down meta");
-                            clientOut.flush();
-                            return;
+                            seconds = 0;
                         }
 
                         try {
