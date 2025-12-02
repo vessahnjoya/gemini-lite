@@ -31,13 +31,6 @@ public class Proxy {
                         engine.run();
                     } catch (Exception e) {
                         System.err.println("Error handling connection: " + e.getMessage());
-                        try {
-                            var out = clientSocket.getOutputStream();
-                            out.write("43 proxy error\r\n".getBytes(StandardCharsets.UTF_8));
-                            out.flush();
-                        } catch (IOException e2) {
-
-                        }
                     } finally {
                         try {
                             clientSocket.close();
