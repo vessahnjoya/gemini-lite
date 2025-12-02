@@ -120,7 +120,7 @@ public class ProxyEngine implements Engine {
                         }
 
                         try (var redirectSocket = new Socket()) {
-                            redirectSocket.connect(new InetSocketAddress(redirectUri.getHost(), redirectUri.getPort()));
+                            redirectSocket.connect(new InetSocketAddress(redirectUri.getHost(), DEFAULT_PORT));
 
                             try (var rin = new BufferedInputStream(redirectSocket.getInputStream());
                                     var rout = new BufferedOutputStream(redirectSocket.getOutputStream())) {
