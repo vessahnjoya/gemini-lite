@@ -115,7 +115,16 @@ public class ProxyEngine implements Engine {
                         clientOut.flush();
                         return;
                     }
+                    int redirectCount = 0;
                     while (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+                        redirectCount++;
+
+                        if (redirectCount > 5) {
+                            sendProxyError(clientOut, "Too many redirects");
+                            replySent = true;
+                            clientOut.flush();
+                            return;
+                        }
                         URI redirectUri;
                         if (reply.getMeta().startsWith(URI_SCHEME)) {
                             redirectUri = new URI(reply.getMeta());
