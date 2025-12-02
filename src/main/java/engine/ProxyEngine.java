@@ -16,7 +16,6 @@ public class ProxyEngine implements Engine {
     private final int PROXY_ERROR_CODE = 43;
     private static final String URI_SCHEME = "gemini-lite://";
 
-
     public ProxyEngine(Socket socket) {
         this.clientSocket = socket;
     }
@@ -72,41 +71,79 @@ public class ProxyEngine implements Engine {
                         return;
                     }
 
-                    if (reply.getStatusCode() < 10 || reply.getStatusCode() > 59) {
-                        sendProxyError(clientOut, "Invalid reply status code");
-                    }
+                    if (reply.getStatusCode() == 44) {
+                        int seconds;
+                        try {
+                            seconds = Integer.parseInt(reply.getMeta());
+                        } catch (NumberFormatException e) {
+                            sendProxyError(clientOut, "Proxy error: invalid slow-down meta");
+                            clientOut.flush();
+                            return;
+                        }
 
-                    if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+                        try {
+                            Thread.sleep(seconds * 1000L);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            sendProxyError(clientOut, "Proxy error: Interrupted slow down");
+                            clientOut.flush();
+                            return;
+                        }
+
+                        try (var retrySocket = new Socket()) {
+                            retrySocket.connect(new InetSocketAddress(host, port));
+
+                            try (var retryInput = new BufferedInputStream(retrySocket.getInputStream());
+                                    var retryOuput = new BufferedOutputStream(retrySocket.getOutputStream())) {
+                                request.format(retryOuput);
+                                var retryReply = Reply.parse(retryInput);
+                                retryReply.format(clientOut);
+
+                                if (retryReply.getStatusCode() >= 20 && retryReply.getStatusCode() < 30) {
+                                    retryInput.transferTo(clientOut);
+                                }
+                                clientOut.flush();
+                                return;
+                            }
+
+                        }
+                    } else if (reply.getStatusCode() < 10 || reply.getStatusCode() > 59) {
+                        var rep = new Reply(PROXY_ERROR_CODE, reply.getMeta());
+                        rep.format(clientOut);
+                        replySent = true;
+                        clientOut.flush();
+                        return;
+                    } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
                         URI redirectUri;
                         if (reply.getMeta().startsWith(URI_SCHEME)) {
-                             redirectUri = new URI(reply.getMeta());
-                        }else{
+                            redirectUri = new URI(reply.getMeta());
+                        } else {
                             redirectUri = request.getUri().resolve(reply.getMeta());
                         }
-                        
+
                         try (var redirectSocket = new Socket()) {
                             redirectSocket.connect(new InetSocketAddress(redirectUri.getHost(), redirectUri.getPort()));
 
                             try (var rin = new BufferedInputStream(redirectSocket.getInputStream());
                                     var rout = new BufferedOutputStream(redirectSocket.getOutputStream())) {
-                                        
-                                        var redirectRequest = new Request(redirectUri);
-                                        redirectRequest.format(rout);
 
-                                        var redirectReply = Reply.parse(rin);
+                                var redirectRequest = new Request(redirectUri);
+                                redirectRequest.format(rout);
 
-                                        redirectReply.format(clientOut);
-                                        replySent = true;
+                                var redirectReply = Reply.parse(rin);
 
-                                        if (redirectReply.getStatusCode()>= 20 && reply.getStatusCode() < 30) {
-                                            rin.transferTo(clientOut);
-                                        }
-                                        clientOut.flush();
-                                        return;
+                                redirectReply.format(clientOut);
+                                replySent = true;
+
+                                if (redirectReply.getStatusCode() >= 20 && redirectReply.getStatusCode() < 30) {
+                                    rin.transferTo(clientOut);
+                                }
+                                clientOut.flush();
+                                return;
                             }
-                            
+
                         }
-                        
+
                     }
                     reply.format(clientOut);
                     replySent = true;
