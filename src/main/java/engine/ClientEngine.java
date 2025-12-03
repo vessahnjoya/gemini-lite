@@ -12,7 +12,6 @@ public class ClientEngine implements Engine {
     private String userInput;
     private static final String URI_SCHEME = "gemini-lite";
 
-
     public ClientEngine(URI uri) {
         this.uri = uri;
     }
@@ -98,7 +97,7 @@ public class ClientEngine implements Engine {
 
         try {
             var validateOut = new ByteArrayOutputStream();
-            Request  tempRequest = new Request(current);
+            Request tempRequest = new Request(current);
             tempRequest.format(validateOut);
 
             var validateIn = new ByteArrayInputStream(validateOut.toByteArray());
@@ -113,13 +112,7 @@ public class ClientEngine implements Engine {
         }
 
         Reply reply = Reply.parse(in);
-        if (reply.getStatusCode() == 20) {
-            in.transferTo(System.out);
-            System.out.flush();
-            System.exit(0);
-        } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
-            handleRedirect(current, count, reply.getMeta().trim());
-        } else if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
+        if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
             if (userInput != null) {
                 URI newUri;
                 try {
@@ -133,21 +126,28 @@ public class ClientEngine implements Engine {
                 runWithRedirect(newUri, count + 1);
                 return;
             }
-        } else if (reply.getStatusCode() == 44) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
+        } else if (reply.getStatusCode() == 20) {
+            in.transferTo(System.out);
+            System.out.flush();
+            System.exit(0);
+        } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+            handleRedirect(current, count, reply.getMeta().trim());
+        } else if (reply.getStatusCode() >= 40 && reply.getStatusCode() < 50) {
+            if (reply.getStatusCode() == 44) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+
+                runWithRedirect(current, 0);
+                return;
+
             }
-
-            runWithRedirect(current, 0);
-            return;
-
+            System.out.flush();
+            System.exit(reply.getStatusCode());
         } else if (reply.getStatusCode() >= 50 && reply.getStatusCode() < 60) {
             System.out.flush();
             System.exit(reply.getStatusCode());
-        } else if (reply.getStatusCode() >= 40 && reply.getStatusCode() < 50) {
-            System.out.flush();
-            System.exit(0);
         }
         System.out.flush();
         System.exit(1);
