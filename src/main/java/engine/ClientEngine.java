@@ -113,9 +113,9 @@ public class ClientEngine implements Engine {
         }
 
         Reply reply;
-        try{
+        try {
             reply = Reply.parse(in);
-        }catch(ProtocolSyntaxException e){
+        } catch (ProtocolSyntaxException e) {
             System.err.println("invalid reply: " + e.getMessage());
             System.out.flush();
             System.exit(1);
@@ -143,13 +143,25 @@ public class ClientEngine implements Engine {
                 runWithRedirect(newUri, count + 1);
                 return;
             }
-        } else if (reply.getStatusCode() == 20) {
+        }
+
+        if (reply.getStatusCode() == 20) {
             in.transferTo(System.out);
             System.out.flush();
             System.exit(0);
-        } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+        }
+
+        if (reply.getStatusCode() != 20 && in.available() > 0) {
+            System.err.println("Non success responses should not contain bodies!");
+            System.out.flush();
+            System.exit(1);
+            return;
+        }
+
+        if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
             handleRedirect(current, count, reply.getMeta().trim());
-        } else if (reply.getStatusCode() >= 40 && reply.getStatusCode() < 50) {
+        }
+        if (reply.getStatusCode() >= 40 && reply.getStatusCode() < 50) {
             if (in.available() > 0 && reply.getStatusCode() != 44) {
                 System.err.println("Temporary failures should not contain bodies");
                 System.out.flush();
@@ -165,9 +177,11 @@ public class ClientEngine implements Engine {
                 return;
 
             }
-                System.out.flush();
-                System.exit(reply.getStatusCode());
-        } else if (reply.getStatusCode() >= 50 && reply.getStatusCode() < 60) {
+            System.out.flush();
+            System.exit(reply.getStatusCode());
+        }
+
+        if (reply.getStatusCode() >= 50 && reply.getStatusCode() < 60) {
             System.out.flush();
             System.exit(reply.getStatusCode());
         }
