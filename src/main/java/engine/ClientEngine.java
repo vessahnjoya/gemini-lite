@@ -147,7 +147,7 @@ public class ClientEngine implements Engine {
             System.exit(reply.getStatusCode());
         } else if (reply.getStatusCode() >= 40 && reply.getStatusCode() < 50) {
             System.out.flush();
-            System.exit(1);
+            System.exit(0);
         }
         System.out.flush();
         System.exit(1);
