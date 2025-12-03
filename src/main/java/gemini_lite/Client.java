@@ -9,6 +9,7 @@ import protocol.Request;
 public class Client {
     private static Engine engine;
     private static String proxyEnv;
+    public final static String MANDATORY_URI_STRING_START = "gemini-lite://";
 
     public static void main(String[] args) throws Throwable {
 
@@ -17,6 +18,11 @@ public class Client {
             System.exit(1);
         }
         String URIstring = args[0];
+
+        if (!URIstring.toLowerCase().startsWith(MANDATORY_URI_STRING_START)) {
+            System.err.println("Invalid request");
+            System.exit(1);
+        }
         try {
             Request.validateUriString(URIstring);
         } catch (URISyntaxException | ProtocolSyntaxException e) {
