@@ -118,7 +118,14 @@ public class ClientEngine implements Engine {
         }catch(ProtocolSyntaxException e){
             System.err.println("invalid reply: " + e.getMessage());
             System.out.flush();
-            System.exit(51);
+            System.exit(1);
+            return;
+        }
+
+        if (reply.getStatusCode() < 10 || reply.getStatusCode() > 59) {
+            System.err.println("Unsupported codes");
+            System.out.flush();
+            System.exit(1);
             return;
         }
 
