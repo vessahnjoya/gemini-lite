@@ -12,7 +12,7 @@
         ],
         "exitcode": 1,
         "stdout": "",
-        "justification": "Status codes MUST be between 10 and 59 as per project manual. A client SHOULD reject any status code greater than 59. Here the server sends 60, so the client must treat this as a protocol syntax error and exit with error code 1, with nothing inside stdout."
+        "justification": "Status codes MUST be between 10 and 59 as per project manual. A client SHOULD reject any status code greater than 59. Here the server sends 70, so the client must treat this as a protocol syntax error and exit with error code 1, with nothing inside stdout."
     },
     {
         "type": "client",
@@ -46,7 +46,7 @@
         ],
         "exitcode": 0,
         "stdout": "content\r\n",
-        "justification": "Client MUST redirect if given a status code 30, in this case it should redirect 1 time. Hnece this test cases verifies redirect support. This is required by Gemini specification, section 'Redirection' of https://geminiprotocol.net/docs/protocol-specification.gmi which requires redictions"
+        "justification": "Client MUST redirect if given a status code 30, in this case it should redirect 1 time. Hence this test cases verifies redirect support. This is required by Gemini specification, section 'Redirection' of https://geminiprotocol.net/docs/protocol-specification.gmi which requires redirections"
     },
     {
         "type": "client",
@@ -87,7 +87,7 @@
         "request": "gemini-lite://user@localhost/\r\n",
         "reply_regex": "^59( .*)?$",
         "body": "",
-        "justification": "Gemini URIs must not contain a userinfo component. The request URI includes 'user@' before the host, so the server must reject it and return an error response with code 59 and no body as writen in the 'overview' section of https://geminiprotocol.net/docs/protocol-specification.gmi"
+        "justification": "Gemini URIs must not contain a userinfo component. The request URI includes 'user@' before the host, so the server must reject it and return an error response with code 59 and no body as written in the 'overview' section of https://geminiprotocol.net/docs/protocol-specification.gmi"
     },
     {
         "type": "server",
@@ -104,12 +104,14 @@
         "type": "server",
         "name": "serve nested file path",
         "documents": {
-            "docs/blabla.gmi": "# Data inside Nested file\r\n"
+            "docs":{
+                "blabla.gmi": "# Data inside Nested file\r\n"
+            }
         },
         "request": "gemini-lite://localhost/docs/blabla.gmi\r\n",
         "reply_regex": "^20 text/gemini.*$",
         "body": "# Data inside Nested file\r\n",
-        "justification": "From the official gemini protocol specification, if the request URI path points directly to a .gmi file whether its in root directory or subfolder, the server should return the contents of that file with a status code of 20 and media type text/gemini  "
+        "justification": "From the official gemini protocol specification, if the request URI path points directly to a .gmi file whether its in root directory or subfolder, the server should return the contents of that file with a status code of 20 and media type text/gemini."
     },
     {
         "type": "proxy",
