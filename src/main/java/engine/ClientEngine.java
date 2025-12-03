@@ -3,7 +3,6 @@ package engine;
 import java.io.*;
 import java.net.*;
 
-import handler.ReplyAndBody;
 import protocol.*;
 
 public class ClientEngine implements Engine {
@@ -113,7 +112,16 @@ public class ClientEngine implements Engine {
             System.exit(1);
         }
 
-        Reply reply = Reply.parse(in);
+        Reply reply;
+        try{
+            reply = Reply.parse(in);
+        }catch(ProtocolSyntaxException e){
+            System.err.println("invalid reply: " + e.getMessage());
+            System.out.flush();
+            System.exit(51);
+            return;
+        }
+
         if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
             if (userInput != null) {
                 URI newUri;
@@ -135,7 +143,7 @@ public class ClientEngine implements Engine {
         } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
             handleRedirect(current, count, reply.getMeta().trim());
         } else if (reply.getStatusCode() >= 40 && reply.getStatusCode() < 50) {
-            if (in.available() > 0) {
+            if (in.available() > 0 && reply.getStatusCode() != 44) {
                 System.err.println("Temporary failures should not contain bodies");
                 System.out.flush();
                 System.exit(1);
@@ -149,13 +157,12 @@ public class ClientEngine implements Engine {
                 runWithRedirect(current, 0);
                 return;
 
-            }else{
+            }
                 System.out.flush();
                 System.exit(reply.getStatusCode());
-            }
         } else if (reply.getStatusCode() >= 50 && reply.getStatusCode() < 60) {
             System.out.flush();
-            System.exit(1);
+            System.exit(reply.getStatusCode());
         }
         System.out.flush();
         System.exit(1);
