@@ -118,7 +118,7 @@ public class ClientEngine implements Engine {
         }catch(ProtocolSyntaxException e){
             System.err.println("invalid reply: " + e.getMessage());
             System.out.flush();
-            System.exit(51);
+            System.exit(1);
             return;
         }
 
