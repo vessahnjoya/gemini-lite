@@ -2,6 +2,8 @@ package engine;
 
 import java.io.*;
 import java.net.*;
+
+import handler.ReplyAndBody;
 import protocol.*;
 
 public class ClientEngine implements Engine {
@@ -133,6 +135,11 @@ public class ClientEngine implements Engine {
         } else if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
             handleRedirect(current, count, reply.getMeta().trim());
         } else if (reply.getStatusCode() >= 40 && reply.getStatusCode() < 50) {
+            if (in.available() > 0) {
+                System.err.println("Temporary failures should not contain bodies");
+                System.out.flush();
+                System.exit(1);
+            }
             if (reply.getStatusCode() == 44) {
                 try {
                     Thread.sleep(1000);
@@ -142,12 +149,13 @@ public class ClientEngine implements Engine {
                 runWithRedirect(current, 0);
                 return;
 
+            }else{
+                System.out.flush();
+                System.exit(reply.getStatusCode());
             }
-            System.out.flush();
-            System.exit(reply.getStatusCode());
         } else if (reply.getStatusCode() >= 50 && reply.getStatusCode() < 60) {
             System.out.flush();
-            System.exit(reply.getStatusCode());
+            System.exit(1);
         }
         System.out.flush();
         System.exit(1);
