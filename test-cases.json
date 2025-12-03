@@ -102,14 +102,14 @@
     },
     {
         "type": "server",
-        "name": "",
+        "name": "serve nested file path",
         "documents": {
-            "index.gmi": "# Root index\r\n"
+            "docs/blabla.gmi": "# Data inside Nested file\r\n"
         },
-        "request": "gemini-lite://localhost\r\n",
+        "request": "gemini-lite://localhost/docs/blabla.gmi\r\n",
         "reply_regex": "^20 text/gemini.*$",
-        "body": "# Root index\r\n",
-        "justification": "An empty path in the request URI is equivalent to '/'. When the document root contains index.gmi, a request for gemini-lite://localhost must be served from that file, returning status 20 text/gemini and the file contents as written in the 'overview' section of https://geminiprotocol.net/docs/protocol-specification.gmi "
+        "body": "# Data inside Nested file\r\n",
+        "justification": "From the official gemini protocol specification, if the request URI path points directly to a .gmi file whether its in root directory or subfolder, the server should return the contents of that file with a status code of 20 and media type text/gemini  "
     },
     {
         "type": "proxy",
