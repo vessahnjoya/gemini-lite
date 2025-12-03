@@ -32,13 +32,6 @@ public class Proxy {
                         engine.run();
                     } catch (Exception e) {
                         System.err.println("Error handling connection: " + e.getMessage());
-                        var reply = new Reply(43, "Proxy error: connection refused");
-                        try {
-                            reply.format(clientSocket.getOutputStream());
-                            clientSocket.getOutputStream().flush();
-                            return;
-                        } catch (IOException e1) {
-                        }
                     } finally {
                         try {
                             clientSocket.close();

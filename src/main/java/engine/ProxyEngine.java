@@ -1,6 +1,7 @@
 package engine;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
@@ -56,7 +57,11 @@ public class ProxyEngine implements Engine {
                 try {
                     socket.connect(new InetSocketAddress(host, port));
                 } catch (UnknownHostException e) {
-                    sendProxyError(clientOut, "proxy error: cannot connect");
+                    sendProxyError(clientOut, "proxy error: unknown host");
+                    clientOut.flush();
+                    return;
+                } catch(ConnectException e){
+                    sendProxyError(clientOut, "Proxy error: connection refused");
                     clientOut.flush();
                     return;
                 }
