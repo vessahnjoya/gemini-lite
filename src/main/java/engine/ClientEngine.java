@@ -25,10 +25,6 @@ public class ClientEngine implements Engine {
         this.uri = uri;
     }
 
-    private boolean hasUserInfo() {
-        return uri.getUserInfo() != null;
-    }
-
     private int getPort(URI current) {
         if (current.getPort() == -1) {
             return DEFAULT_PORT;
@@ -42,10 +38,6 @@ public class ClientEngine implements Engine {
 
     @Override
     public void run() throws IOException {
-        if (hasUserInfo()) {
-            System.err.println(" Invalid URI, URI should not contain UserInfo!");
-            System.exit(1);
-        }
 
         if (socket == null) {
             var host = getHost(uri);
@@ -101,8 +93,19 @@ public class ClientEngine implements Engine {
     }
 
     private void processRequest(URI current, InputStream in, OutputStream out, int count) throws IOException {
-        Request request = new Request(current);
-        request.format(out);
+
+        try {
+            var validateOut = new ByteArrayOutputStream();
+            var validateIn = new ByteArrayInputStream(validateOut.toByteArray());
+
+            var request = Request.parse(validateIn);
+
+            request.format(out);
+
+        } catch (ProtocolSyntaxException | URISyntaxException e) {
+            System.err.println("Invalid request: " + e.getMessage());
+            System.exit(1);
+        }
 
         Reply reply = Reply.parse(in);
         if (reply.getStatusCode() == 20) {
@@ -113,7 +116,7 @@ public class ClientEngine implements Engine {
             handleRedirect(current, count, reply.getMeta().trim());
         } else if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
             if (userInput != null) {
-                
+
                 URI newUri;
                 try {
                     newUri = utils.URIutils.buildNewURI(current, userInput);

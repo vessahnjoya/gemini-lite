@@ -5,13 +5,22 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
+import utils.URIutils;
+
 public class Request {
     private final URI uri;
+    private final String URIstring;
     private static final int MAX_URI_BYTE_SIZE = 1024;
     private static final String URI_SCHEME = "gemini-lite://";
 
     public Request(URI uri) {
         this.uri = uri;
+        this.URIstring = null;
+    }
+
+    public Request(String URIstring) throws URISyntaxException {
+        this.URIstring = URIstring;
+        this.uri = new URI(URIstring);
     }
 
     public URI getUri() {
@@ -51,11 +60,25 @@ public class Request {
         if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME)) {
             throw new ProtocolSyntaxException("Invalid or empty URI");
         }
-        return new Request(new URI(line));
+
+        var uri = new URI(line);
+        if (uri.getUserInfo() != null) {
+            throw new ProtocolSyntaxException("user info not allowed");
+        }
+
+        if (uri.getFragment()!= null) {
+            throw new ProtocolSyntaxException("fragments not allowed");
+        }
+
+        return new Request(line);
     }
 
     public void format(OutputStream requestOutput) throws IOException {
-        StringBuilder builder = new StringBuilder();
+        String requestLine;
+        if (URIstring != null) {
+            requestLine = URIstring;
+        } else{
+            StringBuilder builder = new StringBuilder();
         builder.append(uri.getScheme()).append("://").append(uri.getHost());
         
         if (uri.getPort() != -1) {
@@ -69,8 +92,10 @@ public class Request {
         if (uri.getRawQuery() != null) {
             builder.append("?").append(uri.getRawQuery());
         }
+        requestLine = builder.toString();
+        }
 
-        String request = builder.toString() + "\r\n";
+        String request = requestLine + "\r\n";
         requestOutput.write(request.getBytes(StandardCharsets.UTF_8));
         requestOutput.flush();
     }

@@ -13,6 +13,7 @@ import protocol.*;
 
 public class FileSystemRequestHandler implements ResourceHandler {
     private final Path path;
+    private static final String URI_SCHEME = "gemini-lite://";
 
     public FileSystemRequestHandler(Path path) {
         if (path == null) {
@@ -27,28 +28,18 @@ public class FileSystemRequestHandler implements ResourceHandler {
             URI uri = request.getUri();
             String pathString = uri.getPath();
 
-            if (!"gemini-lite".equalsIgnoreCase(uri.getScheme())) {
+            if (!URI_SCHEME.equalsIgnoreCase(uri.getScheme())) {
                 return new Reply(59, "Invalid URI, does not contain expected scheme").withoutBody();
             }
 
-            if (uri.getUserInfo() != null) {
-                return new Reply(59, "User info not allowed").withoutBody();
+            if (pathString == null || pathString.isEmpty()) {
+                pathString = "/";
             }
 
-            if (uri.getFragment()!= null) {
-                return new Reply(59, "").withoutBody();
-            }
+            var requestedPath = resolvePath(pathString);
 
-            Path requestedPath;
-
-            if (pathString == null || pathString.isEmpty()|| pathString.equals("/")) {
-                requestedPath = path.resolve("index.gmi");
-            }else{
-                requestedPath = path.resolve(pathString.substring(1));
-            }
-
-            if (!Files.exists(requestedPath) || !Files.isReadable(requestedPath)) {
-                return new Reply(51, "Not Found").withoutBody();
+            if (requestedPath == null) {
+                return new Reply(59, "bad request").withoutBody();
             }
 
             if (Files.isDirectory(requestedPath)) {
@@ -58,7 +49,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
                 return new Reply(20, mime).withBody(body);
             }
 
-            if (Files.isRegularFile(requestedPath) && Files.isReadable(requestedPath)) {
+            if (Files.exists(requestedPath) && Files.isRegularFile(requestedPath) && Files.isReadable(requestedPath)) {
                 String mime = getMimeType(requestedPath);
                 InputStream body = Files.newInputStream(requestedPath);
                 return new Reply(20, mime).withBody(body);
@@ -74,17 +65,17 @@ public class FileSystemRequestHandler implements ResourceHandler {
     private String getMimeType(Path filePath) {
         String fileName = filePath.getFileName().toString();
 
-        if (fileName.endsWith(".gmi")) {
+        if (fileName.toLowerCase().endsWith(".gmi")) {
             return "text/gemini";
-        } else if (fileName.endsWith(".txt")) {
+        } else if (fileName.toLowerCase().endsWith(".txt")) {
             return "text/plain";
-        } else if (fileName.endsWith(".gif")) {
+        } else if (fileName.toLowerCase().endsWith(".gif")) {
             return "image/gif";
-        } else if (fileName.endsWith(".html") || fileName.endsWith(".htm")) {
+        } else if (fileName.toLowerCase().endsWith(".html") || fileName.endsWith(".htm")) {
             return "text/html";
-        } else if (fileName.endsWith(".png")) {
+        } else if (fileName.toLowerCase().endsWith(".png")) {
             return "image/png";
-        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+        } else if (fileName.toLowerCase().endsWith(".jpg") || fileName.endsWith(".jpeg")) {
             return "image/jpeg";
         }
 
