@@ -4,11 +4,7 @@ import java.net.*;
 
 import engine.*;
 
-/**
- * This class handles the Client
- */
 public class Client {
-    // variable holding reference to the engine
     private static Engine engine;
     private static String proxyEnv;
 
