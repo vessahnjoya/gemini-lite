@@ -5,7 +5,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
-
 public class Request {
     private final URI uri;
     private final String URIstring;
@@ -66,33 +65,60 @@ public class Request {
             throw new ProtocolSyntaxException("user info not allowed");
         }
 
-        if (uri.getFragment()!= null) {
+        if (uri.getFragment() != null) {
             throw new ProtocolSyntaxException("fragments not allowed");
         }
 
         return new Request(line);
     }
 
+    public static void validateUriString(String line)
+            throws ProtocolSyntaxException, URISyntaxException {
+
+        if (line == null) {
+            throw new ProtocolSyntaxException("Invalid or empty URI");
+        }
+
+        byte[] bytes = line.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length > MAX_URI_BYTE_SIZE) {
+            throw new ProtocolSyntaxException("URI exceeds max length");
+        }
+
+        if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME)) {
+            throw new ProtocolSyntaxException("Invalid or empty URI");
+        }
+
+        URI uri = new URI(line);
+
+        if (uri.getUserInfo() != null) {
+            throw new ProtocolSyntaxException("user info not allowed");
+        }
+
+        if (uri.getFragment() != null) {
+            throw new ProtocolSyntaxException("fragments not allowed");
+        }
+    }
+
     public void format(OutputStream requestOutput) throws IOException {
         String requestLine;
         if (URIstring != null) {
             requestLine = URIstring;
-        } else{
+        } else {
             StringBuilder builder = new StringBuilder();
-        builder.append(uri.getScheme()).append("://").append(uri.getHost());
-        
-        if (uri.getPort() != -1) {
-            builder.append(":").append(uri.getPort());
-        }
+            builder.append(uri.getScheme()).append("://").append(uri.getHost());
 
-        if (uri.getPath() != null) {
-            builder.append(uri.getPath());
-        }
+            if (uri.getPort() != -1) {
+                builder.append(":").append(uri.getPort());
+            }
 
-        if (uri.getRawQuery() != null) {
-            builder.append("?").append(uri.getRawQuery());
-        }
-        requestLine = builder.toString();
+            if (uri.getPath() != null) {
+                builder.append(uri.getPath());
+            }
+
+            if (uri.getRawQuery() != null) {
+                builder.append("?").append(uri.getRawQuery());
+            }
+            requestLine = builder.toString();
         }
 
         String request = requestLine + "\r\n";

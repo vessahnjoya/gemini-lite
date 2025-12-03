@@ -3,6 +3,7 @@ package gemini_lite;
 import java.net.*;
 
 import engine.*;
+import protocol.ProtocolSyntaxException;
 import protocol.Request;
 
 public class Client {
@@ -17,19 +18,15 @@ public class Client {
         }
         String URIstring = args[0];
         try {
-            new Request(URIstring);
-        } catch (Exception e) {
+            Request.validateUriString(URIstring);
+        } catch (URISyntaxException | ProtocolSyntaxException e) {
             System.err.println("invlaid request URI: " + e.getMessage());
             System.exit(1);
         }
 
         var uri = new URI(URIstring);
-        String userInput = null;
-        try {
-            userInput = args[1];
-        } catch (Exception e) {
-            System.err.println("running without user input");
-        }
+        String userInput = args[1];
+        
         proxyEnv = System.getenv("GEMINI_LITE_PROXY");
 
         if (proxyEnv == null || proxyEnv.isEmpty()) {
