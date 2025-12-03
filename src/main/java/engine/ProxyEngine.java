@@ -60,7 +60,7 @@ public class ProxyEngine implements Engine {
                     sendProxyError(clientOut, "proxy error: unknown host");
                     clientOut.flush();
                     return;
-                } catch(ConnectException e){
+                } catch (ConnectException e) {
                     sendProxyError(clientOut, "Proxy error: connection refused");
                     clientOut.flush();
                     return;
@@ -142,20 +142,18 @@ public class ProxyEngine implements Engine {
                                     var redirectRequest = new Request(redirectString);
                                     redirectRequest.format(rout);
 
-                                    var redirectReply = Reply.parse(rin);
+                                    reply = Reply.parse(rin);
 
-                                    redirectReply.format(clientOut);
-                                    replySent = true;
-
-                                    if (redirectReply.getStatusCode() >= 20 && redirectReply.getStatusCode() < 30) {
-                                        rin.transferTo(clientOut);
-                                    }
-                                    clientOut.flush();
-                                    return;
                                 }
 
                             }
 
+                        }
+                        if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
+                            sendProxyError(clientOut, "Proxy error: too many rerdirects");
+                            replySent = true;
+                            clientOut.flush();
+                            return;
                         }
 
                     }
