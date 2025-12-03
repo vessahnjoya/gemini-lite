@@ -5,13 +5,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
-import utils.URIutils;
 
 public class Request {
     private final URI uri;
     private final String URIstring;
     private static final int MAX_URI_BYTE_SIZE = 1024;
-    private static final String URI_SCHEME = "gemini-lite://";
+    private static final String URI_SCHEME = "gemini-lite";
 
     public Request(URI uri) {
         this.uri = uri;
@@ -56,6 +55,7 @@ public class Request {
 
             buffer.write(reader);
         }
+
         String line = buffer.toString(StandardCharsets.UTF_8.name());
         if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME)) {
             throw new ProtocolSyntaxException("Invalid or empty URI");

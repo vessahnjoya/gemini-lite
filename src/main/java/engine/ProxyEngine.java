@@ -18,7 +18,7 @@ public class ProxyEngine implements Engine {
     private final int PROXY_ERROR_CODE = 43;
     private final int CLIENT_ERROR_CODE = 59;
     private final int MAX_REDIRECTS = 5;
-    private static final String URI_SCHEME = "gemini-lite://";
+    private static final String URI_SCHEME = "gemini-lite";
 
     public ProxyEngine(Socket socket) {
         this.clientSocket = socket;

@@ -13,7 +13,7 @@ import protocol.*;
 
 public class FileSystemRequestHandler implements ResourceHandler {
     private final Path path;
-    private static final String URI_SCHEME = "gemini-lite://";
+    private static final String URI_SCHEME = "gemini-lite";
 
     public FileSystemRequestHandler(Path path) {
         if (path == null) {

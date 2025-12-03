@@ -10,6 +10,8 @@ public class ClientEngine implements Engine {
     private final int DEFAULT_PORT = 1958;
     private Socket socket;
     private String userInput;
+    private static final String URI_SCHEME = "gemini-lite";
+
 
     public ClientEngine(URI uri) {
         this.uri = uri;
@@ -83,7 +85,7 @@ public class ClientEngine implements Engine {
             return;
         }
 
-        if (!"gemini-lite".equalsIgnoreCase(target.getScheme())) {
+        if (!URI_SCHEME.equalsIgnoreCase(target.getScheme())) {
             System.err.println("Non-Gemini redirect not supported: " + target);
             System.exit(1);
             return;
