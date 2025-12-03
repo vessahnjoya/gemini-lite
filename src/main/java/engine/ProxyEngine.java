@@ -125,20 +125,20 @@ public class ProxyEngine implements Engine {
 
                         while (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40 && count < MAX_REDIRECTS) {
                             count++;
-                            URI redirectUri;
+                            String redirectString;
                             if (reply.getMeta().startsWith(URI_SCHEME)) {
-                                redirectUri = new URI(reply.getMeta());
+                                redirectString = reply.getMeta();
                             } else {
-                                redirectUri = request.getUri().resolve(reply.getMeta());
+                                redirectString = request.getUri().resolve(reply.getMeta()).toString();
                             }
-
+                            var redirectUri = new URI(redirectString);
                             try (var redirectSocket = new Socket()) {
                                 redirectSocket.connect(new InetSocketAddress(redirectUri.getHost(), DEFAULT_PORT));
 
                                 try (var rin = new BufferedInputStream(redirectSocket.getInputStream());
                                         var rout = new BufferedOutputStream(redirectSocket.getOutputStream())) {
 
-                                    var redirectRequest = new Request(redirectUri);
+                                    var redirectRequest = new Request(redirectString);
                                     redirectRequest.format(rout);
 
                                     var redirectReply = Reply.parse(rin);

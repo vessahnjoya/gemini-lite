@@ -2,11 +2,9 @@ package gemini_lite;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 
 import engine.*;
-import protocol.Reply;
 
 public class Proxy {
     private static Engine engine;
