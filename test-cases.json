@@ -76,7 +76,7 @@
         "request": "gemini-lite://localhost/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\r\n",
         "reply_regex": "^59( .*)?$",
         "body": "",
-        "justification": "The request line URI must not exceed the maximum length specified in the protocol. This request uses a very long path, so the server should treat it as a bad request and respond with an error status 59 and an empty body."
+        "justification": "The request line URI must not exceed the maximum length specified in the protocol under section Requests section of https://geminiprotocol.net/docs/protocol-specification.gmi . This request uses a very long path, so the server should treat it as a bad request and respond with an error status 59 and an empty body."
     },
     {
         "type": "server",
@@ -98,7 +98,7 @@
         "request": "gemini-lite://localhost/path#fragment\r\n",
         "reply_regex": "^59( .*)?$",
         "body": "",
-        "justification": "Clients must not send a fragment identifier to the server. When a request URI contains a fragment, the server should treat it as invalid and respond with a 59 error and an empty body."
+        "justification": "Clients must not send a fragment identifier to the server as specified under the requests section of https://geminiprotocol.net/docs/protocol-specification.gmi . When a request URI contains a fragment, the server should treat it as invalid and respond with a 59 error and an empty body."
     },
     {
         "type": "server",
@@ -127,20 +127,20 @@
         ],
         "reply_regex": "^20 text/plain$",
         "body": "OK",
-        "justification": "When the server responds with a 44 slow-down status, the proxy must not hide or reinterpret it. The proxy should backoff then retry once, and relay the final reply (status line) and its body to the client."
+        "justification": "When the server responds with a 44 slow-down status, the proxy must not hide or reinterpret it. The proxy should backoff then retry once, and relay the final reply (status line) and its body to the client as specified under the status codes section of https://geminiprotocol.net/docs/protocol-specification.gmi ."
     },
     {
         "type": "proxy",
-        "name": "Relay input request responses to the client",
-        "request": "gemini-lite://localhost/search\r\n",
+        "name": "Relay sensitive-input request responses to the client",
+        "request": "gemini-lite://localhost/login\r\n",
         "server_transactions": [
             {
-                "url": "gemini-lite://localhost/search",
-                "reply": "10 Enter search term\r\n"
+                "url": "gemini-lite://localhost/login",
+                "reply": "11 Enter password\r\n"
             }
         ],
-        "reply_regex": "^10 Enter search term$",
+        "reply_regex": "^11 Enter password$",
         "body": "",
-        "justification": "Input (1x) responses require interaction with a user, which a proxy cannot perform on behalf of its clients. When the server replies with '10 Enter search term', the proxy must relay the same header to the client and not send any body."
+        "justification": "Status code 11 represents sensitive input where the server requests input that must not be echoed such as a password. The proxy should only relay the status and meta to its client, with no body so the client can present a non echoing prompt as specified under the status codes section of https://geminiprotocol.net/docs/protocol-specification.gmi ."
     }
 ]
