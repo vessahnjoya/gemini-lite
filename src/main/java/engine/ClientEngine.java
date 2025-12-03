@@ -96,9 +96,12 @@ public class ClientEngine implements Engine {
 
         try {
             var validateOut = new ByteArrayOutputStream();
+            Request  tempRequest = new Request(current);
+            tempRequest.format(validateOut);
+            
             var validateIn = new ByteArrayInputStream(validateOut.toByteArray());
 
-            var request = Request.parse(validateIn);
+            Request request = Request.parse(validateIn);
 
             request.format(out);
 

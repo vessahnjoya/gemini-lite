@@ -10,9 +10,7 @@ Student ID number: i6371413
 
 (Insert user documentation for your program here. Include command-line usage instructions.)
 
-### Bonus enhancements
-
-(If you attempt any bonus enhancements, document them in this section.)
+`The ClientEngine class implements the core logic for handling Gemini Lite protocol interactions respective to a client, including redirects, input requests, and slow down responses. It uses a recursive approach through runWithRedirect() to manage up to 5 redirects before failing with exit code 1. The engine format client request, and parses server replies and takes specific actions based on status codes.`
 
 ## Gemini Lite Server Program
 
