@@ -144,26 +144,27 @@ public class ProxyEngine implements Engine {
 
                                     reply = Reply.parse(rin);
 
+                                    reply.format(clientOut);
+                                    replySent = true;
+
+                                    if (reply.getStatusCode() >= 20 && reply.getStatusCode() <= 29) {
+                                        rin.transferTo(clientOut);
+                                        clientOut.flush();
+                                        return;
+                                    }
+
                                 }
 
                             }
 
                         }
                         if (reply.getStatusCode() >= 30 && reply.getStatusCode() < 40) {
-                            sendProxyError(clientOut, "Proxy error: too many rerdirects");
+                            sendProxyError(clientOut, "Proxy error: too many redirects");
                             replySent = true;
                             clientOut.flush();
                             return;
                         }
 
-                    }
-                    reply.format(clientOut);
-                    replySent = true;
-
-                    if (reply.getStatusCode() >= 20 && reply.getStatusCode() <= 29) {
-                        in.transferTo(clientOut);
-                        clientOut.flush();
-                        return;
                     }
 
                 } catch (Exception e) {
