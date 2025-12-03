@@ -98,7 +98,7 @@ public class ClientEngine implements Engine {
             var validateOut = new ByteArrayOutputStream();
             Request  tempRequest = new Request(current);
             tempRequest.format(validateOut);
-            
+
             var validateIn = new ByteArrayInputStream(validateOut.toByteArray());
 
             Request request = Request.parse(validateIn);
@@ -119,7 +119,6 @@ public class ClientEngine implements Engine {
             handleRedirect(current, count, reply.getMeta().trim());
         } else if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
             if (userInput != null) {
-
                 URI newUri;
                 try {
                     newUri = utils.URIutils.buildNewURI(current, userInput);

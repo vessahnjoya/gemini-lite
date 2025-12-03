@@ -12,6 +12,12 @@ Student ID number: i6371413
 
 `The ClientEngine class implements the core logic for handling Gemini Lite protocol interactions respective to a client, including redirects, input requests, and slow down responses. It uses a recursive approach through runWithRedirect() to manage up to 5 redirects before failing with exit code 1. The engine format client request, and parses server replies and takes specific actions based on status codes.`
 
+`For status code 44 (slow down), the client sleeps for 1 second using Thread.sleep(1000) then retries the same request recursively without incrementing the redirect count. This prevents overwhelming servers during temporary overload while maintaining connection persistence. No body is expected or processed for these replies, aligning with protocol specifications.`
+
+`Input requests (status codes 10-19) use the optional command-line input if provided during ClientEngine construction; otherwise, the program runs without. The input string constructs a new URI via URIutils. and triggers a recursive request to the updated URI.`
+
+`Protocol errors, invalid redirects print messages to stderr and exit with code 1. Success (code 20) dumps raw body bytes to stdout and exits with status code 0; permanent errors (40-59) exit with the status code after flushing. The engine validates requests before sending and handles inccorect transactions by catching exceptions.`
+
 ## Gemini Lite Server Program
 
 (Insert user documentation for your program here. Include command-line usage instructions.)
