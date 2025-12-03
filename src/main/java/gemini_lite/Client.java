@@ -3,6 +3,7 @@ package gemini_lite;
 import java.net.*;
 
 import engine.*;
+import protocol.Request;
 
 public class Client {
     private static Engine engine;
@@ -14,23 +15,30 @@ public class Client {
             System.err.println("Invalid Request, no URI present");
             System.exit(1);
         }
+        String URIstring = args[0];
+        try {
+            new Request(URIstring);
+        } catch (Exception e) {
+            System.err.println("invlaid request URI: " + e.getMessage());
+            System.exit(1);
+        }
 
-        var uri = new URI(args[0]);
+        var uri = new URI(URIstring);
         String userInput = null;
-        try{
+        try {
             userInput = args[1];
-        }catch(Exception e){
-            // System.err.println("running without user input");
+        } catch (Exception e) {
+            System.err.println("running without user input");
         }
         proxyEnv = System.getenv("GEMINI_LITE_PROXY");
 
         if (proxyEnv == null || proxyEnv.isEmpty()) {
             if (userInput != null) {
                 engine = new ClientEngine(uri, userInput);
-            }else{
+            } else {
                 engine = new ClientEngine(uri);
             }
-            
+
         } else {
             String[] proxyParts = proxyEnv.split(":", 2);
             String host = proxyParts[0];
@@ -42,8 +50,8 @@ public class Client {
                 return;
             }
 
-            try(var proxySocket = new Socket(host, port)) {
-                engine = new ClientEngine( proxySocket,uri);
+            try (var proxySocket = new Socket(host, port)) {
+                engine = new ClientEngine(proxySocket, uri);
                 engine.run();
                 return;
             } catch (Exception e) {
@@ -51,7 +59,7 @@ public class Client {
                 System.exit(1);
                 return;
             }
-            
+
         }
 
         engine.run();
