@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
+import utils.URIutils;
+
 public class Request {
     private final URI uri;
     private final String URIstring;
@@ -58,6 +60,16 @@ public class Request {
         if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME)) {
             throw new ProtocolSyntaxException("Invalid or empty URI");
         }
+
+        var uri = new URI(line);
+        if (uri.getUserInfo() != null) {
+            throw new ProtocolSyntaxException("user info not allowed");
+        }
+
+        if (uri.getFragment()!= null) {
+            throw new ProtocolSyntaxException("fragments not allowed");
+        }
+
         return new Request(line);
     }
 

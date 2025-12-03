@@ -32,14 +32,6 @@ public class FileSystemRequestHandler implements ResourceHandler {
                 return new Reply(59, "Invalid URI, does not contain expected scheme").withoutBody();
             }
 
-            if (uri.getUserInfo() != null) {
-                return new Reply(59, "User info not allowed").withoutBody();
-            }
-
-            if (uri.getFragment()!= null) {
-                return new Reply(59, "Fragment not allowed").withoutBody();
-            }
-
             if (pathString == null || pathString.isEmpty()) {
                 pathString = "/";
             }
