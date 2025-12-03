@@ -127,7 +127,7 @@
         ],
         "reply_regex": "^20 text/plain$",
         "body": "OK",
-        "justification": "When the server responds with a 44 slow-down status, the proxy must not hide or reinterpret it. It should relay the same status code and meta to its client, with no response body."
+        "justification": "When the server responds with a 44 slow-down status, the proxy must not hide or reinterpret it. The proxy should backoff then retry once, and relay the final reply (status line) and its body to the client."
     },
     {
         "type": "proxy",
