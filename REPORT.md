@@ -8,38 +8,52 @@ Student ID number: i6371413
 
 ## Gemini Lite Client Program
 
-(Insert user documentation for your program here. Include command-line usage instructions.)
+`The ClientEngine class implements the core logic for handling Gemini Lite protocol interactions respective to a client, including redirects, input requests, and slow down responses. It uses a recursive approach through runWithRedirect() to manage up to 5 redirects before failing with exit code 1. The engine format client request, and parses server replies and takes specific actions based on status codes. Exit codes indicate success (0), protocol errors (match status code such as code 50, 56 etc), or failures (1)`
 
-`The ClientEngine class implements the core logic for handling Gemini Lite protocol interactions respective to a client, including redirects, input requests, and slow down responses. It uses a recursive approach through runWithRedirect() to manage up to 5 redirects before failing with exit code 1. The engine format client request, and parses server replies and takes specific actions based on status codes.`
+`The Client runs using java -cp target/bcs2110-2025.jar gemini_lite.Client <URL> [<input>],
+where <URL> specifies a gemini-lite:// resource and [<input>] provides optional user input for interactive prompts.`
 
-`For status code 44 (slow down), the client sleeps for 1 second using Thread.sleep(1000) then retries the same request recursively without incrementing the redirect count. This prevents overwhelming servers during temporary overload while maintaining connection persistence. No body is expected or processed for these replies, aligning with protocol specifications.`
+`For status code 44 (slow down), the client sleeps for 1 second then retries the same request recursively without incrementing the redirect count. This prevents overwhelming servers while maintaining connection. No body is expected or processed for these replies, aligning with protocol specifications.`
 
-`Input requests (status codes 10-19) use the optional command-line input if provided during ClientEngine construction; otherwise, the program runs without. The input string constructs a new URI via URIutils. and triggers a recursive request to the updated URI.`
+`Input requests status codes 10-19 use the optional command-line input if provided during ClientEngine construction, otherwise the program runs without. The input string constructs a new URI via URIutils. and triggers a recursive request to the updated URI.`
 
-`Protocol errors, invalid redirects print messages to stderr and exit with code 1. Success (code 20) dumps raw body bytes to stdout and exits with status code 0; permanent errors (40-59) exit with the status code after flushing. The engine validates requests before sending and handles inccorect transactions by catching exceptions.`
+`Protocol errors, invalid redirects print messages to stderr and exit with code 1. Success code 20 transfers body (in bytes) to stdout and exits with status code 0, permanent errors codes 40-59 exit with the status code after flushing. The engine validates requests before sending and handles inccorect transactions by catching exceptions.`
 
 ## Gemini Lite Server Program
 
-(Insert user documentation for your program here. Include command-line usage instructions.)
+`The ServerEngine accepts connections on the specified port using a ServerSocket, handling each in a loop with eahc connection hisolaterd for good error handling. It parses requests, delegates to ResourceHandler, and sends replies with optional bodies, catching exceptions to return code 50 (server error) or 59 (bad request).`
 
-### Bonus enhancements
+`The Gemini Lite server runs using java -cp target/bcs2110-2025.jar gemini_lite.Server <directory> [<port>], serving files from <directory> on port 1958 or mthe specified [port]. Requests to gemini-lite://HOSTNAME[:port]/path, or gemini-lite://HOSTNAME/path map to files under the document root. Invalid arguments, missing directories, print to stderr and exit with code 1.`
 
-(If you attempt any bonus enhancements, document them in this section.)
+`Directory requests generate a text/gemini listing of sorted contents with "=>" link filename lines. Directories return code 20 with generated body instead of 51.`
+
+`Malformed requests return status code 59, unhandled exceptions return code 50, followed by socket close. Server continues after client disconnects mid-response or no request. Non gemini-lite schemes are rejected with code 59.`
+
+`As for load testing, I had no clue what to do, nor understood approaches from ai so will not do`
 
 ## Gemini Lite Proxy Program
 
-(Insert user documentation for your program here. Include command-line usage instructions.)
+`ProxyEngine accepts client connections, parses Gemini Lite requests, and establishes upstream connections with default port 1958. It implements full redirect following up to 5 and slow-down handling by parsing meta seconds, sleeping, retrying, and relaying final responses. The Proxy relays input reply codes 10-19 directly to clients.`
 
-### Bonus enhancements
+`The Proxy runs with java -cp target/bcs2110-2025.jar gemini_lite.Proxy <port>, listening on specified TCP port using threaded connection handling via Executors. Clients set GEMINILITEPROXY=localhost:<port> environment variable to route through proxy, which forwards requests to upstream servers transparently.`
 
-(If you attempt any bonus enhancements, document them in this section.)
+`Redirects codes 30-40 are handled by resolve the request uri, creating new sockets, and forwarding recursively up to a maximum of 5 redirects. Exceeding the limit sends Proxy error with code 43. The following generate proxy error:`
 
+    Missing/empty host in request URI​
 
-### Client test cases
+    UnknownHostException
 
-### Server test cases
+    ConnectException (connection refused)
 
-### Proxy test cases
+    Invalid reply parsing
+
+    Input requests 10-19
+
+    Invalid redirect URI during resolution​
+
+    Excessive redirects (>5)​
+
+    Interrupted slow-down
 
 ## Alternative DNS, Bakeoff and Wireshark outputs
 
@@ -65,19 +79,19 @@ Final content of `/var/lib/bind/db.zone.lab-kale`
 
 ![alt text](report-images/step3-part3.png)
 
--
-
 #### Step 5
 
 Name: Berke
- request line: gemini-lite://boogeyman.boogle.lab-kale/test.gmi
 
-20 text/gemini; charset=utf-8
-#..Heading
+- request line: gemini-lite://boogeyman.boogle.lab-kale/test.gmi
+- Reply:
 
-regular text
+    20 text/gemini; charset=utf-8
+    #..Heading
 
-=> /link
+    regular text
+
+    => /link
 
 ### Lab5
 
@@ -102,92 +116,92 @@ regular text
 
 - What is the relative sequence number of the start of this data block?
 
-`0`
+    `0`
 
 - What is the raw sequence number of the start of this data block?
 
-`762728800`
+    `762728800`
 
 - What will the next relative sequence number be?
 
-`1`
+    `1`
 
 6- Look at the very next packet, coming back to the client from the server.
 
 - What is its relative acknowledgement number?
 
-`1`
+    `1`
 
 - What is its raw acknowledgement number?
 
-`762728801`
+    `762728801`
 
 - How do these numbers relate to the numbers from the previous question?
 
-`increase by 1`
+    `increase by 1`
 
 7- Find the packet(s) conveying the Gemini Lite™ reply data from the server to the client
 
 - How many of them are there in your capture? (When I did this, I had two separate packets, one with the reply line and one with the body.)
 
-`1, when i filter for "ip.src == 10.2.0.101 && tcp.srcport == 1958 && ip.dst == 10.2.2.169 && tcp.len > 0" i get 1 packet which contains the body and the reply line (see filtered-packet.txt file under report-images folder).`
+    `1, when i filter for "ip.src == 10.2.0.101 && tcp.srcport == 1958 && ip.dst == 10.2.2.169 && tcp.len > 0" i get 1 packet which contains the body and the reply line (see filtered-packet.txt file under report-images folder).`
 
 8- Find the first packet with the TCP FIN bit set.
 
--Is it a packet from the client or from the server
+- Is it a packet from the client or from the server
 
-`from the client`
+    `from the client`
 
 #### lab 5: Packet capture of joining a network
 
-1- What are the source and destination ethernet addresses for the request packet?
+- What are the source and destination ethernet addresses for the request packet?
 
-`source: 5e:05:18:37:73:a2,
+    `source: 5e:05:18:37:73:a2,
 destination: ff:ff:ff:ff:ff:ff`
 
-2- What are the IP source and destination addresses in the request packet?
+- What are the IP source and destination addresses in the request packet?
 
-`source: 0.0.0.0, destination: 255.255.255.255`
+    `source: 0.0.0.0, destination: 255.255.255.255`
 
-3- What are the UDP source and destination port numbers in the request packet?
+- What are the UDP source and destination port numbers in the request packet?
 
-`source: 68, destination: 67`
+    `source: 68, destination: 67`
 
-4- What is the value of the DHCP “Your (client) IP address” field in the request packet?
+- What is the value of the DHCP “Your (client) IP address” field in the request packet?
 
-`IP: 0.0.0.0`
+    `IP: 0.0.0.0`
 
-5- Does the request contain an Option 50 (Requested IP Address)? If so, what is the IP address being requested?
+- Does the request contain an Option 50 (Requested IP Address)? If so, what is the IP address being requested?
 
-`Requested IP: 10.2.2.169`
+    `Requested IP: 10.2.2.169`
 
-6- What are the source and destination ethernet addresses for the ACK packet?
+- What are the source and destination ethernet addresses for the ACK packet?
 
-`source: 2c:cf:67:32:7f:67, destination: 5e:05:18:37:73:a2`
+    `source: 2c:cf:67:32:7f:67, destination: 5e:05:18:37:73:a2`
 
-7- What are the IP source and destination addresses in the ACK packet?
+- What are the IP source and destination addresses in the ACK packet?
 
-`source: 10.2.0.1, destination: 10.2.2.169`
+    `source: 10.2.0.1, destination: 10.2.2.169`
 
-8- What are the UDP source and destination port numbers in the ACK packet?
+- What are the UDP source and destination port numbers in the ACK packet?
 
-`source: 67, destination: 68`
+    `source: 67, destination: 68`
 
-9- What is the value of the DHCP “Your (client) IP address” field in the ACK packet?
+- What is the value of the DHCP “Your (client) IP address” field in the ACK packet?
 
-`IP: 10.2.2.169`
+    `IP: 10.2.2.169`
 
-10- What are the values of the following DHCP options in the ACK packet?
+- What are the values of the following DHCP options in the ACK packet?
 
-`Option (1) Subnet Mask: 255.255.252.0, length: 4`
+    `Option (1) Subnet Mask: 255.255.252.0`
 
-`Option (3) Router: 10.2.0.3, length: 4`
+    `Option (3) Router: 10.2.0.3`
 
-`Option (6) Domain Name Server: 10.2.0.1, length: 4`
+    `Option (6) Domain Name Server: 10.2.0.1`
 
-11- Look back at Lab 2. Use the appropriate command (ip route, netstat -rn, or route print) to print out your laptop’s forwarding table. Satisfy yourself you can find the Subnet Mask and Router from the DHCP ACK packet in your machine’s forwarding table. Copy and paste the table into your report.
+- Look back at Lab 2. Use the appropriate command (ip route, netstat -rn, or route print) to print out your laptop’s forwarding table. Satisfy yourself you can find the Subnet Mask and Router from the DHCP ACK packet in your machine’s forwarding table. Copy and paste the table into your report.
 
-`unfortunately I did not answer these questions during the lab hence cannot have the subnet mask inside the route table as I am not connected to the kale network anymore`
+    `unfortunately I did not answer these questions during the lab hence cannot have the subnet mask inside the route table as I am not connected to the kale network anymore`
 
 #### lab 5: Packet capture of Gemini Lite™ server
 
@@ -249,7 +263,7 @@ Having such response format makes it easy to implement the protocol`
 
 - Do you need to make changes to the gemini-lite network protocol? If so, which?
 
-     ``
+     `Other than making new additions to the gemtext format, MIME types support. I cannot think of any specification to be removed or added. Mini-project wise for understanding networking and coding it, is doable. So no, I cannot think of a change to the protocol that can make it richer.`
 
 - Do you need to make changes to the Gemtext format? If so, which?
 
@@ -266,4 +280,4 @@ In terms of bandwidth, the gemini protocol is less efficient, as there is no cac
 
 `With a basic knowledge of networks and protocols, understanding the specificatrions are easy. conventions are used to clearly define what should be done, potential improvemements. Only downside can be code strcuture (how to handle redirects, error replies while respecting SOLID principles) which was hard for me where i did not know if i should have a separate error class and depending on each engine, call that class an assign the respective error reply etc.
 `
-``
+`The specification is clear in my opinion (maybe i am being to chill with it cause i really had a fun time DEBUGGING TEST CASES, which showed me i had to read specifications/best practices over and over to gerneratre my own test cases and also understand others and make sure my implimentations respects the rules as far as i could), uses good conventions. status codes are well defined ,requests transactions are provided, best practices provide more details on redirects, file names, and some possible enhancements are suggested leaving the user room for enhancements.`

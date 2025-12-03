@@ -65,7 +65,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
     private String getMimeType(Path filePath) {
         String fileName = filePath.getFileName().toString();
 
-        if (fileName.toLowerCase().endsWith(".gmi")) {
+        if (fileName.toLowerCase().endsWith(".gmi") || fileName.toLowerCase().endsWith(".gmni") || fileName.toLowerCase().endsWith(".gemini")) {
             return "text/gemini";
         } else if (fileName.toLowerCase().endsWith(".txt")) {
             return "text/plain";
