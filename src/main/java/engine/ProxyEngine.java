@@ -83,7 +83,8 @@ public class ProxyEngine implements Engine {
                         try {
                             seconds = Integer.parseInt(reply.getMeta().trim());
                         } catch (NumberFormatException e) {
-                            sendProxyError(clientOut, "Proxy error: invalid slow down meta");
+                            reply.format(clientOut);
+                            replySent = true;
                             clientOut.flush();
                             return;
                         }
