@@ -139,7 +139,7 @@ public class ClientEngine implements Engine {
             } catch (InterruptedException e) {
             }
 
-            runWithRedirect(current, count + 1);
+            runWithRedirect(current, 0);
             return;
 
         } else if (reply.getStatusCode() >= 50 && reply.getStatusCode() < 60) {

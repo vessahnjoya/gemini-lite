@@ -25,7 +25,12 @@ public class Client {
         }
 
         var uri = new URI(URIstring);
-        String userInput = args[1];
+        String userInput = null;
+        try {
+            userInput = args[1];
+        } catch (Exception e) {
+            
+        }
         
         proxyEnv = System.getenv("GEMINI_LITE_PROXY");
 

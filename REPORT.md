@@ -8,7 +8,7 @@ Student ID number: i6371413
 
 ## Gemini Lite Client Program
 
-`The ClientEngine class implements the core logic for handling Gemini Lite protocol interactions respective to a client, including redirects, input requests, and slow down responses. It uses a recursive approach through runWithRedirect() to manage up to 5 redirects before failing with exit code 1. The engine format client request, and parses server replies and takes specific actions based on status codes. Exit codes indicate success (0), protocol errors (match status code such as code 50, 56 etc), or failures (1)`
+`The ClientEngine class implements the logic for handling Gemini Lite protocol interactions respective to a client, including redirects, input requests, and slow down responses. It uses a recursive approach to manage up to 5 redirects before failing with exit code 1. The engine formats client request, and parses server replies and takes specific actions based on status codes. Exit codes indicate success (0), protocol errors status code such as code 50-59, or failures (1)`
 
 `The Client runs using java -cp target/bcs2110-2025.jar gemini_lite.Client <URL> [<input>],
 where <URL> specifies a gemini-lite:// resource and [<input>] provides optional user input for interactive prompts.`
