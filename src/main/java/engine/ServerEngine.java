@@ -56,9 +56,9 @@ public class ServerEngine implements Engine {
                 replyAndBody = resourceHandler.handle(request);
 
             } catch (ProtocolSyntaxException e) {
-                replyAndBody = new Reply(59, "").withoutBody();
+                replyAndBody = new Reply(59, "bad request").withoutBody();
             } catch (Exception e) {
-                new Reply(50, "").format(o);
+                new Reply(50, "Bad request").format(o);
                 o.flush();
                 System.err.println("Handle error: " + e.getMessage());
             }
