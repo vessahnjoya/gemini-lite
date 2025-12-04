@@ -10,6 +10,9 @@ public class Request {
     private final String URIstring;
     private static final int MAX_URI_BYTE_SIZE = 1024;
     private static final String URI_SCHEME = "gemini-lite";
+    private static final char[] UNSAFE_CHARACTERS = {
+            ' ', '"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`'
+    };
 
     public Request(URI uri) {
         this.uri = uri;
@@ -56,9 +59,7 @@ public class Request {
         }
 
         String line = buffer.toString(StandardCharsets.UTF_8.name());
-        if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME) || line.contains(" ")) {
-            throw new ProtocolSyntaxException("Invalid or empty URI");
-        }
+        validateUriString(line);
 
         var uri = new URI(line);
         if (uri.getUserInfo() != null) {
@@ -84,7 +85,7 @@ public class Request {
             throw new ProtocolSyntaxException("URI exceeds max length");
         }
 
-        if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME)) {
+        if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME) || unsafeCharactersChecker(line)) {
             throw new ProtocolSyntaxException("Invalid or empty URI");
         }
 
@@ -101,6 +102,17 @@ public class Request {
         if (uri.getRawAuthority() != null && uri.getAuthority().contains(":") && uri.getPort() == -1) {
             throw new ProtocolSyntaxException("Invlaid Port");
         }
+    }
+
+    private static boolean unsafeCharactersChecker(String line){
+        for (char c : line.toCharArray()) {
+            for (char u : UNSAFE_CHARACTERS) {
+                if (c == u) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void format(OutputStream requestOutput) throws IOException {
