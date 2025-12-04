@@ -11,7 +11,7 @@ public class Request {
     private static final int MAX_URI_BYTE_SIZE = 1024;
     private static final String URI_SCHEME = "gemini-lite";
     private static final char[] UNSAFE_CHARACTERS = {
-            ' ', '"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`'
+            ' ', '"', '<', '>', '#', '{', '}', '|', '\\', '^', '~', '[', ']', '`'
     };
 
     public Request(URI uri) {
