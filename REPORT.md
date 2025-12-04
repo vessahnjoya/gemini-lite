@@ -229,7 +229,7 @@ destination: ff:ff:ff:ff:ff:ff`
 
     `-There is assymetry where the port corresponding to the client differs in both captures, while the port corresponding to the server is always the same (1958)`
 
-    `- `
+    `-`
 
 #### Lab 5: Port Scan
 
@@ -240,7 +240,6 @@ destination: ff:ff:ff:ff:ff:ff`
 6.22-
 
 ![sudo nmap -A -T5 pi0038.kale](report-images/step6.12.png)
-
 
 ## Reflection on Gemini Lite
 

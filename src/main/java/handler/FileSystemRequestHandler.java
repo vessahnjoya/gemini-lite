@@ -71,11 +71,11 @@ public class FileSystemRequestHandler implements ResourceHandler {
             return "text/plain";
         } else if (fileName.toLowerCase().endsWith(".gif")) {
             return "image/gif";
-        } else if (fileName.toLowerCase().endsWith(".html") || fileName.endsWith(".htm")) {
+        } else if (fileName.toLowerCase().endsWith(".html") || fileName.toLowerCase().endsWith(".htm")) {
             return "text/html";
         } else if (fileName.toLowerCase().endsWith(".png")) {
             return "image/png";
-        } else if (fileName.toLowerCase().endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+        } else if (fileName.toLowerCase().endsWith(".jpg") || fileName.toLowerCase().endsWith(".jpeg")) {
             return "image/jpeg";
         }
 
