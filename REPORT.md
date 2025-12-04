@@ -227,9 +227,9 @@ destination: ff:ff:ff:ff:ff:ff`
 
 - When programming using TCP socket APIs, programming a client feels very different to programming a server. When you compare and contrast your two packet capture traces, one for a client and one for a server, what (if any) of that asymmetry do you notice in the on-the-wire packets? Is anything substantially different from the on-the-wire perspective about TCP acting as a server and TCP acting as a client? Why do you think this is?
 
-    `-There is assymetry where the port corresponding to the client differs in both captures, while the port corresponding to the server is always the same (1958)`
+    `-The TCP protocol is conceptually symmetric but assymetry occurs when used as Client/Server. In this project, assymetry occurs when one side acts as a server listening for connections while the other is a server awaiting connection request`
 
-    `-`
+    `Additional I think there is assymetry where the port corresponding to the client differs in both captures, while the port corresponding to the server is always the same (1958)`
 
 #### Lab 5: Port Scan
 
