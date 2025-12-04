@@ -56,7 +56,7 @@ public class Request {
         }
 
         String line = buffer.toString(StandardCharsets.UTF_8.name());
-        if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME)) {
+        if (line.isEmpty() || !line.toLowerCase().startsWith(URI_SCHEME) || line.contains(" ")) {
             throw new ProtocolSyntaxException("Invalid or empty URI");
         }
 
