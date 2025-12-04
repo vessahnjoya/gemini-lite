@@ -172,7 +172,9 @@ public class ProxyEngine implements Engine {
         try {
             seconds = Integer.parseInt(slowDownReply.getMeta().trim());
         } catch (NumberFormatException e) {
-            seconds = 1;
+            sendProxyError(clientOut, "unknown sleep time");
+            clientOut.flush();
+            return;
         }
 
         try {
@@ -188,10 +190,8 @@ public class ProxyEngine implements Engine {
             retrySocket.connect(new InetSocketAddress(host, port));
 
             try (var retryInput = new BufferedInputStream(retrySocket.getInputStream());
-                    var retryOutput = new BufferedOutputStream(retrySocket.getOutputStream())) {
-                request.format(retryOutput);
-                retryOutput.flush();
-
+                    var retryOuput = new BufferedOutputStream(retrySocket.getOutputStream())) {
+                request.format(retryOuput);
                 var retryReply = Reply.parse(retryInput);
                 retryReply.format(clientOut);
 
