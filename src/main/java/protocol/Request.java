@@ -61,15 +61,6 @@ public class Request {
         String line = buffer.toString(StandardCharsets.UTF_8.name());
         validateUriString(line);
 
-        var uri = new URI(line);
-        if (uri.getUserInfo() != null) {
-            throw new ProtocolSyntaxException("user info not allowed");
-        }
-
-        if (uri.getFragment() != null) {
-            throw new ProtocolSyntaxException("fragments not allowed");
-        }
-
         return new Request(line);
     }
 
