@@ -168,10 +168,17 @@ public class ClientEngine implements Engine {
                 System.exit(1);
             }
             if (reply.getStatusCode() == 44) {
+                int seconds;
                 try {
-                    Thread.sleep(1000);
+                    seconds =  Integer.parseInt(reply.getMeta());
+                } catch (NumberFormatException e) {
+                    seconds = 1;
+                }
+                try {
+                    Thread.sleep(seconds * 1000L);
                 } catch (InterruptedException e) {
                 }
+
 
                 runWithRedirect(current, 0);
                 return;
