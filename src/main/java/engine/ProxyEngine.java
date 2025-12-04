@@ -172,7 +172,6 @@ public class ProxyEngine implements Engine {
         try {
             seconds = Integer.parseInt(slowDownReply.getMeta().trim());
         } catch (NumberFormatException e) {
-            slowDownReply.format(clientOut);
             clientOut.flush();
             return;
         }
