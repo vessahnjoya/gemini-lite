@@ -140,7 +140,7 @@ public class ClientEngine implements Engine {
                     System.exit(1);
                     return;
                 }
-                runWithRedirect(newUri, 0);
+                runWithRedirect(newUri, count + 1);
                 return;
             }
         }
