@@ -92,6 +92,11 @@ public class Reply {
 
         for (int i = 0; i < meta.length(); i++) {
             char character = meta.charAt(i);
+
+            if ((character >= 0x00 && character <= 0x1F) || character == 0x7F) {
+                throw new ProtocolSyntaxException("Meta contains control character");
+            }
+            
             if (character >= 0x80 && character <= 0x9F) {
                 throw new ProtocolSyntaxException("Meta contains C1 control");
             }

@@ -124,7 +124,7 @@
             },
             {
                 "url": "gemini-lite://localhost/resource",
-                "reply": "20 text/plain\r\nOk"
+                "reply": "20 text/plain\r\nOK"
             }
         ],
         "reply_regex": "^20 text/plain$",
