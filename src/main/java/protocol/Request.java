@@ -97,6 +97,10 @@ public class Request {
         if (uri.getFragment() != null) {
             throw new ProtocolSyntaxException("fragments not allowed");
         }
+
+        if (uri.getRawAuthority() != null && uri.getAuthority().contains(":") && uri.getPort() == -1) {
+            throw new ProtocolSyntaxException("Invlaid Port");
+        }
     }
 
     public void format(OutputStream requestOutput) throws IOException {
