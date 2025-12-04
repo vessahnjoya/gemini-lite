@@ -172,6 +172,7 @@ public class ProxyEngine implements Engine {
         try {
             seconds = Integer.parseInt(slowDownReply.getMeta().trim());
         } catch (NumberFormatException e) {
+            sendProxyError(clientOut, "unknown sleep time");
             clientOut.flush();
             return;
         }
