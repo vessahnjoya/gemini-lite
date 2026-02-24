@@ -125,19 +125,22 @@ public class ClientEngine implements Engine {
         }
 
         if (reply.getStatusCode() >= 10 && reply.getStatusCode() < 20) {
-            if (userInput != null) {
-                URI newUri;
-                try {
-                    newUri = utils.URIutils.buildNewURI(current, userInput);
-                    System.err.println("New uri: " + newUri);
-                } catch (URISyntaxException e) {
-                    System.err.println("invalid query");
-                    System.exit(1);
-                    return;
-                }
-                runWithRedirect(newUri, count + 1);
+            if (userInput == null) {
+                System.err.println("Please provide an input: ");
+                userInput = System.console().readLine();
+            }
+
+            URI newUri;
+            try {
+                newUri = utils.URIutils.buildNewURI(current, userInput);
+                System.err.println("Redirecting to new uri: " + newUri);
+            } catch (URISyntaxException e) {
+                System.err.println("invalid query");
+                System.exit(1);
                 return;
             }
+            runWithRedirect(newUri, count + 1);
+            return;
         }
 
         if (reply.getStatusCode() == 20) {

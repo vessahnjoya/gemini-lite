@@ -1,6 +1,9 @@
 package protocol;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import handler.ReplyAndBody;
@@ -103,7 +106,7 @@ public class Reply {
         }
 
         if (statusCode == 20) {
-            if (meta == null || meta.isEmpty() || !meta.contains("/") ) {
+            if (meta.isEmpty() || !meta.contains("/") ) {
                 throw new ProtocolSyntaxException("Missing MIME type");
             }
         }
