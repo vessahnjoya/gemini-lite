@@ -1,9 +1,17 @@
 package engine;
 
-import java.io.*;
-import java.net.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import protocol.*;
+import protocol.ProtocolSyntaxException;
+import protocol.Reply;
+import protocol.Request;
 
 public class ClientEngine implements Engine {
     private final URI uri;
@@ -27,24 +35,11 @@ public class ClientEngine implements Engine {
         this.uri = uri;
     }
 
-    private int getPort(URI current) {
-        if (current.getPort() == -1) {
-            return DEFAULT_PORT;
-        }
-        return current.getPort();
-    }
-
-    private String getHost(URI current) {
-        return current.getHost();
-    }
-
     @Override
     public void run() throws IOException {
 
         if (socket == null) {
-            var host = getHost(uri);
-            var port = getPort(uri);
-            socket = new Socket(host, port);
+            socket = new Socket(uri.getHost(), (uri.getPort() != -1 ? uri.getPort() : DEFAULT_PORT));
         }
 
         runWithRedirect(uri, 0);
@@ -63,7 +58,7 @@ public class ClientEngine implements Engine {
                 processRequest(current, currentIn, currentOut, count);
             }
         } else {
-            try (var currentSocket = new Socket(getHost(current), getPort(current));
+            try (var currentSocket = new Socket(current.getHost(), current.getPort());
                     var currentIn = currentSocket.getInputStream();
                     var currentOut = currentSocket.getOutputStream();) {
                 processRequest(current, currentIn, currentOut, count);
@@ -135,7 +130,7 @@ public class ClientEngine implements Engine {
                 try {
                     newUri = utils.URIutils.buildNewURI(current, userInput);
                     System.err.println("New uri: " + newUri);
-                } catch (Exception e) {
+                } catch (URISyntaxException e) {
                     System.err.println("invalid query");
                     System.exit(1);
                     return;

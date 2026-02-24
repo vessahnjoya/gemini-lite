@@ -1,7 +1,9 @@
 package handler;
 
-import java.io.*;
-import java.net.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -9,7 +11,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import protocol.*;
+import protocol.ProtocolSyntaxException;
+import protocol.Reply;
+import protocol.Request;
 
 public class FileSystemRequestHandler implements ResourceHandler {
     private final Path path;
@@ -57,7 +61,7 @@ public class FileSystemRequestHandler implements ResourceHandler {
 
             return new Reply(51, "Not Found").withoutBody();
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             return new Reply(50, "Server crashed").withoutBody();
         }
     }

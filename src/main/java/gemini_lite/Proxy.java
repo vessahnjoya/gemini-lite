@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.Executors;
 
-import engine.*;
+import engine.Engine;
+import engine.ProxyEngine;
 
 public class Proxy {
     private static Engine engine;
@@ -28,12 +29,12 @@ public class Proxy {
                     try {
                         engine = new ProxyEngine(clientSocket);
                         engine.run();
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         System.err.println("Error handling connection: " + e.getMessage());
                     } finally {
                         try {
                             clientSocket.close();
-                        } catch (Exception e) {
+                        } catch (IOException e) {
                         }
                     }
                 });

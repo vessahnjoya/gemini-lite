@@ -1,9 +1,8 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.Test;
 
 public class UriTests {
@@ -19,6 +18,6 @@ public class UriTests {
         final var u2 = new URI("?other%20input");
         assertEquals("?other%20input", u2.toString());
         assertNotEquals("gemini-lite://test.example/foo/bar?other%20input",
-            u1.resolve(u2).toString()); // the "bar" part goes missing!
+                u1.resolve(u2).toString()); // the "bar" part goes missing!
     }
 }

@@ -1,11 +1,15 @@
 package engine;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URISyntaxException;
 
 import handler.ReplyAndBody;
 import handler.ResourceHandler;
-import protocol.*;
+import protocol.ProtocolSyntaxException;
+import protocol.Reply;
+import protocol.Request;
 
 public class ServerEngine implements Engine {
     private final int port;
@@ -13,29 +17,22 @@ public class ServerEngine implements Engine {
     private final int DEFAULT_PORT = 1958;
 
     public ServerEngine(int port, ResourceHandler resourceHandler) {
-        this.port = port;
+        this.port = port != -1 ? port : DEFAULT_PORT;
         this.resourceHandler = resourceHandler;
 
-    }
-
-    private int getPort() {
-        if (port == -1) {
-            return DEFAULT_PORT;
-        }
-        return port;
     }
 
     @Override
     public void run() throws IOException {
 
-        try (final var server = new ServerSocket(getPort())) {
-            System.err.println("Listening on port " + getPort());
+        try (final var server = new ServerSocket(port)) {
+            System.err.println("Listening on port " + port);
             while (true) {
                 Socket socket = null;
                 try {
                     socket = server.accept();
                     handleConnection(socket);
-                } catch (Exception e) {
+                } catch (IOException | URISyntaxException e) {
                     System.err.println("Error handling connection: " + e.getMessage());
                     if (socket.isClosed()) {
                         sendErrorReply(socket, new Reply(50, ""));
@@ -46,8 +43,8 @@ public class ServerEngine implements Engine {
     }
 
     public void handleConnection(Socket socket) throws IOException, URISyntaxException {
-        Request request = null;
-        ReplyAndBody replyAndBody = null;
+        Request request;
+        ReplyAndBody replyAndBody;
         try (var i = socket.getInputStream();
                 var o = socket.getOutputStream();) {
             try {

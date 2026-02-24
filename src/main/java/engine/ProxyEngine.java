@@ -1,6 +1,8 @@
 package engine;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -27,11 +29,11 @@ public class ProxyEngine implements Engine {
     @Override
     public void run() throws IOException {
         try (var clientIin = new BufferedInputStream(clientSocket.getInputStream());
-                var clientOut = new BufferedOutputStream(clientSocket.getOutputStream())) {
-            Request request = null;
+                var clientOut = new BufferedOutputStream(clientSocket.getOutputStream()); clientSocket) {
+            Request request;
             try {
                 request = Request.parse(clientIin);
-            } catch (Exception e) {
+            } catch (IOException | URISyntaxException e) {
                 sendErrorOnBadRequest(clientOut, "Invalid request");
                 clientOut.flush();
                 return;
@@ -73,7 +75,7 @@ public class ProxyEngine implements Engine {
                     Reply reply;
                     try {
                         reply = Reply.parse(in);
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         sendProxyError(clientOut, "proxy error: Invalid Client");
                         clientOut.flush();
                         return;
@@ -104,7 +106,6 @@ public class ProxyEngine implements Engine {
                         in.transferTo(clientOut);
                     }
                     clientOut.flush();
-                    return;
 
                 } catch (Exception e) {
                     if (!replySent) {
@@ -115,7 +116,6 @@ public class ProxyEngine implements Engine {
                 }
 
             }
-            clientSocket.close();
         }
     }
 
@@ -136,7 +136,7 @@ public class ProxyEngine implements Engine {
             try {
                 redirectUri = new URI(redirectString);
 
-            } catch (Exception e) {
+            } catch (URISyntaxException e) {
                 sendProxyError(clientOut, "Proxy error: invalid request URI");
                 clientOut.flush();
                 return true;
@@ -208,7 +208,7 @@ public class ProxyEngine implements Engine {
     private void sendProxyError(BufferedOutputStream out, String meta) throws IOException {
         try {
             new Reply(PROXY_ERROR_CODE, meta).format(out);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Failed to send proxy Error");
             System.exit(1);
         }
@@ -217,7 +217,7 @@ public class ProxyEngine implements Engine {
     private void sendErrorOnBadRequest(BufferedOutputStream out, String meta) throws IOException {
         try {
             new Reply(CLIENT_ERROR_CODE, meta).format(out);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Failed to send client Error");
             System.exit(1);
         }
